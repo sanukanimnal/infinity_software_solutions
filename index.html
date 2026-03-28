@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A/L 2026 Countdown</title>
+    <style>
+        :root {
+            /* Purple palette from the image */
+            --bg-purple: #7b4397;
+            --bg-purple-dark: #5e3373;
+            --card-white: #ffffff;
+            --text-dark: #333333;
+            --text-secondary: #666666;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-purple);
+            /* Creating the pattern effect using SVG as a background repeat */
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 86c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm66-3c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-46-45c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm54 0c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM57 7c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-8 48c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM25 30c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm60 52c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM9 53c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm44 0c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm40 24c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM33 46c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm45 0c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM9 13c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm44 0c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm40 24c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%236e3c87' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        /* Profile/Logo Header */
+        .profile-badge {
+            background: white;
+            padding: 8px 24px 8px 12px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: -35px; /* Pull the card under it */
+            z-index: 10;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #7b4397, #5e3373);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            margin-right: 12px;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Emoji placeholder for hourglass logo */
+        .avatar::after {
+            content: '♾️';
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .profile-handle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main White Card */
+        .card {
+            background: var(--card-white);
+            width: 100%;
+            padding: 80px 40px 60px 40px;
+            border-radius: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .days-number {
+            font-size: 12rem;
+            font-weight: 900;
+            color: #222222;
+            line-height: 0.8;
+            margin: 0;
+            font-family: "Arial Black", sans-serif;
+            letter-spacing: -5px;
+        }
+
+        .days-label {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #666666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 15px;
+        }
+
+        .footer-tag {
+            margin-top: 40px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        /* Responsive scaling */
+        @media (max-width: 480px) {
+            .days-number {
+                font-size: 8rem;
+            }
+            .days-label {
+                font-size: 1.1rem;
+            }
+            .card {
+                padding: 60px 20px 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Header Badge -->
+        <div class="profile-badge">
+            <div class="avatar"></div>
+            <div class="profile-info">
+                <span class="profile-name">Infinity Software Solutions</span>
+                <span class="profile-handle">@Exam_Countdown_Bot</span>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+            <div class="days-number" id="days-count">000</div>
+            <div class="days-label">Days Left</div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-tag">
+            Infinity SL 🇱🇰
+        </div>
+    </div>
+
+    <script>
+        // Target date: GCE A/L 2026 (Approximately August 2026)
+        // Adjust the date as needed
+        const targetDate = new Date("August 10, 2026 00:00:00").getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            // Calculate only days as per the design
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+
+            const display = document.getElementById("days-count");
+            
+            if (days > 0) {
+                display.innerText = days;
+            } else {
+                display.innerText = "0";
+            }
+        }
+
+        // Initial call
+        updateCountdown();
+
+        // Update every hour is enough for a day-based counter
+        setInterval(updateCountdown, 3600000);
+    </script>
+</body>
+</html>
