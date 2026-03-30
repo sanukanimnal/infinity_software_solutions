@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChemQuiz - Multiplayer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, arrayUnion, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABvpsPAw91FRtyposImpYjcuT76HpzJIk",
+            authDomain: "chemistry-mcq-online.firebaseapp.com",
+            projectId: "chemistry-mcq-online",
+            storageBucket: "chemistry-mcq-online.firebasestorage.app",
+            messagingSenderId: "580145806220",
+            appId: "1:580145806220:web:94f0be409881fe2beeb4a9",
+            measurementId: "G-MS53DLB4PV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let currentRoom = null;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let countdownInterval = null;
+        let unsubscribeRoom = null;
+
+        const chemistryQuestions = [
+            { q: "What is the atomic number of Carbon?", a: ["6", "12", "14", "8"], c: 0 },
+            { q: "Which gas is known as 'Laughing Gas'?", a: ["CO2", "N2O", "O2", "CH4"], c: 1 },
+            { q: "What is the pH of pure water?", a: ["1", "5", "7", "14"], c: 2 },
+            { q: "Which element is a liquid at room temperature?", a: ["Iron", "Mercury", "Gold", "Silver"], c: 1 },
+            { q: "What is the chemical symbol for Gold?", a: ["Gd", "Ag", "Au", "Pb"], c: 2 }
+        ];
+
+        const views = ['auth-view', 'menu-view', 'lobby-view', 'game-view', 'loading-view'];
+        function showView(viewId) {
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        const initAuth = async () => {
+            try {
+                await signInAnonymously(auth);
+            } catch (err) {
+                if (err.code === 'auth/admin-restricted-operation') {
+                    document.getElementById('auth-error').innerText = "Please enable 'Anonymous Auth' in Firebase Console.";
+                    document.getElementById('auth-error').classList.remove('hidden');
+                }
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                const userRef = doc(db, 'users', user.uid);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    document.getElementById('display-username').innerText = userSnap.data().username;
+                    document.getElementById('display-userid').innerText = user.uid;
+                    showView('menu-view');
+                    loadLeaderboard();
+                } else {
+                    showView('auth-view');
+                }
+            } else {
+                showView('loading-view');
+            }
+        });
+
+        window.registerUser = async () => {
+            const username = document.getElementById('reg-username').value.trim();
+            if (!username) return alert("Please enter a username");
+            try {
+                await setDoc(doc(db, 'users', currentUser.uid), {
+                    username,
+                    highScore: 0,
+                    uid: currentUser.uid,
+                    createdAt: serverTimestamp()
+                });
+                location.reload();
+            } catch (e) { alert(e.message); }
+        };
+
+        window.createRoom = async () => {
+            const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const userSnap = await getDoc(doc(db, 'users', currentUser.uid));
+            await setDoc(doc(db, 'rooms', roomId), {
+                status: 'waiting',
+                host: currentUser.uid,
+                players: [{ uid: currentUser.uid, name: userSnap.data().username, score: 0, ready: false }],
+                createdAt: serverTimestamp()
+            });
+            joinRoomLogic(roomId);
+        };
+
+        window.joinRoom = async () => {
+            const roomId = document.getElementById('room-id-input').value.toUpperCase().trim();
+            if (!roomId) return;
+            const userSnap = await getDoc(doc(db, 'users', currentUser.uid));
+            const roomRef = doc(db, 'rooms', roomId);
+            const roomSnap = await getDoc(roomRef);
+            if(!roomSnap.exists()) return alert("Room not found!");
+            
+            const players = roomSnap.data().players;
+            if (!players.find(p => p.uid === currentUser.uid)) {
+                await updateDoc(roomRef, {
+                    players: arrayUnion({ uid: currentUser.uid, name: userSnap.data().username, score: 0, ready: false })
+                });
+            }
+            joinRoomLogic(roomId);
+        };
+
+        window.toggleReady = async () => {
+            const roomRef = doc(db, 'rooms', currentRoom);
+            const roomSnap = await getDoc(roomRef);
+            const players = roomSnap.data().players.map(p => 
+                p.uid === currentUser.uid ? { ...p, ready: !p.ready } : p
+            );
+            await updateDoc(roomRef, { players });
+        };
+
+        function joinRoomLogic(roomId) {
+            currentRoom = roomId;
+            if (unsubscribeRoom) unsubscribeRoom();
+            
+            unsubscribeRoom = onSnapshot(doc(db, 'rooms', roomId), (snapshot) => {
+                const data = snapshot.data();
+                if (!data) return;
+
+                // 1. Check if game has started
+                if (data.status === 'playing') {
+                    stopLobbyCountdown();
+                    startClientGame();
+                    return; 
+                }
+
+                // 2. Update Lobby UI
+                document.getElementById('lobby-room-id').innerText = roomId;
+                const playerList = document.getElementById('player-list');
+                playerList.innerHTML = data.players.map(p => `
+                    <li class="flex justify-between items-center p-3 bg-white rounded shadow-sm mb-2 border-l-4 ${p.ready ? 'border-emerald-500' : 'border-gray-300'}">
+                        <span>${p.name} ${p.uid === currentUser.uid ? '(You)' : ''}</span>
+                        <span class="text-[10px] uppercase px-2 py-1 rounded ${p.ready ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'} font-bold">
+                            ${p.ready ? 'Ready' : 'Waiting'}
+                        </span>
+                    </li>
+                `).join('');
+
+                const me = data.players.find(p => p.uid === currentUser.uid);
+                const readyBtn = document.getElementById('ready-btn');
+                readyBtn.innerText = me?.ready ? "Unready" : "Ready Up";
+                readyBtn.className = `w-full p-4 rounded-2xl font-bold shadow-lg transition-all ${me?.ready ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'}`;
+                
+                // 3. Handle Countdown
+                const allReady = data.players.length > 0 && data.players.every(p => p.ready);
+                if (allReady && data.status === 'waiting') {
+                    if (!countdownInterval) startLobbyCountdown(data.host);
+                } else {
+                    stopLobbyCountdown();
+                }
+
+                showView('lobby-view');
+            });
+        }
+
+        function startLobbyCountdown(hostUid) {
+            let timeLeft = 5;
+            const el = document.getElementById('lobby-countdown');
+            el.classList.remove('hidden');
+            document.getElementById('countdown-sec').innerText = timeLeft;
+
+            countdownInterval = setInterval(async () => {
+                timeLeft--;
+                document.getElementById('countdown-sec').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    // Only the host attempts the state change to avoid conflicts
+                    if (currentUser.uid === hostUid) {
+                        await updateDoc(doc(db, 'rooms', currentRoom), { status: 'playing' });
+                    }
+                }
+            }, 1000);
+        }
+
+        function stopLobbyCountdown() {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            document.getElementById('lobby-countdown').classList.add('hidden');
+        }
+
+        window.startClientGame = () => {
+            if (unsubscribeRoom) unsubscribeRoom(); // Stop listening to room updates during game
+            showView('game-view');
+            currentQuestionIndex = 0;
+            score = 0;
+            loadQuestion();
+        };
+
+        function loadQuestion() {
+            const progress = (currentQuestionIndex / chemistryQuestions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+
+            if (currentQuestionIndex >= chemistryQuestions.length) {
+                finishGame();
+                return;
+            }
+            const q = chemistryQuestions[currentQuestionIndex];
+            document.getElementById('question-text').innerText = q.q;
+            const container = document.getElementById('options-container');
+            container.innerHTML = q.a.map((opt, i) => `
+                <button onclick="checkAnswer(${i})" class="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-blue-500 hover:bg-blue-50 transition font-medium">
+                    ${opt}
+                </button>
+            `).join('');
+        }
+
+        window.checkAnswer = (idx) => {
+            if (idx === chemistryQuestions[currentQuestionIndex].c) score += 10;
+            currentQuestionIndex++;
+            loadQuestion();
+        };
+
+        async function finishGame() {
+            await updateDoc(doc(db, 'users', currentUser.uid), { highScore: increment(score) });
+            alert("Quiz Finished! Your Score: " + score);
+            location.reload();
+        }
+
+        function loadLeaderboard() {
+            onSnapshot(collection(db, 'users'), (snap) => {
+                let players = [];
+                snap.forEach(d => players.push(d.data()));
+                players.sort((a, b) => (b.highScore || 0) - (a.highScore || 0));
+                document.getElementById('leaderboard-list').innerHTML = players.slice(0, 5).map((p, i) => `
+                    <div class="flex justify-between p-3 bg-blue-50 rounded-lg text-sm">
+                        <span><b class="text-blue-800">#${i+1}</b> ${p.username}</span>
+                        <span class="font-mono font-bold">${p.highScore || 0}</span>
+                    </div>
+                `).join('');
+            });
+        }
+
+        window.onload = initAuth;
+    </script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-600 to-indigo-900 min-h-screen flex items-center justify-center p-4 font-sans text-gray-900">
+
+    <div class="max-w-md w-full glass rounded-[2.5rem] shadow-2xl p-8">
+        
+        <div id="loading-view" class="text-center py-10">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p class="text-gray-500">Connecting to Lab...</p>
+            <p id="auth-error" class="hidden mt-4 text-red-500 text-sm bg-red-50 p-3 rounded-lg"></p>
+        </div>
+
+        <div id="auth-view" class="hidden">
+            <h1 class="text-4xl font-black text-center mb-2 text-indigo-900">ChemQuiz</h1>
+            <p class="text-center text-gray-500 mb-8">Enter a username to join</p>
+            <div class="space-y-4">
+                <input id="reg-username" type="text" placeholder="Username" class="w-full p-4 rounded-2xl bg-gray-100 outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="registerUser()" class="w-full bg-indigo-600 text-white p-4 rounded-2xl font-bold shadow-lg">Enter Lab</button>
+            </div>
+        </div>
+
+        <div id="menu-view" class="hidden">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold">Hello, <span id="display-username" class="text-indigo-600">...</span></h2>
+                <p class="text-[10px] text-gray-400 font-mono mt-1">UID: <span id="display-userid"></span></p>
+            </div>
+            <div class="space-y-4 mb-8">
+                <button onclick="startClientGame()" class="w-full p-6 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-3xl shadow-md text-left">
+                    <span class="block text-xl font-bold">Single Player</span>
+                    <span class="block text-xs opacity-90">Practice chemistry solo</span>
+                </button>
+                <div class="p-6 bg-indigo-600 text-white rounded-3xl shadow-md">
+                    <p class="font-bold text-xl mb-4">Multiplayer</p>
+                    <button onclick="createRoom()" class="w-full bg-white text-indigo-600 p-3 rounded-xl font-bold mb-3">Create Room</button>
+                    <div class="flex gap-2">
+                        <input id="room-id-input" type="text" placeholder="Code" class="flex-1 p-3 rounded-xl text-gray-900 uppercase font-bold outline-none">
+                        <button onclick="joinRoom()" class="bg-indigo-900 px-6 rounded-xl font-bold">Join</button>
+                    </div>
+                </div>
+            </div>
+            <h3 class="font-bold text-gray-400 uppercase text-[10px] tracking-widest mb-3">Top Chemists</h3>
+            <div id="leaderboard-list" class="space-y-2"></div>
+        </div>
+
+        <div id="lobby-view" class="hidden text-center">
+            <h2 class="text-3xl font-black mb-1 text-indigo-900">Room</h2>
+            <p id="lobby-room-id" class="text-blue-600 font-black text-2xl tracking-widest mb-6"></p>
+            <div id="lobby-countdown" class="hidden mb-4 p-4 bg-emerald-50 text-emerald-700 rounded-2xl font-black text-xl animate-pulse">
+                STARTING IN <span id="countdown-sec">5</span>...
+            </div>
+            <div class="bg-gray-100 rounded-2xl p-4 mb-6 min-h-[150px]">
+                <ul id="player-list" class="text-left"></ul>
+            </div>
+            <button id="ready-btn" onclick="toggleReady()" class="w-full bg-emerald-500 text-white p-4 rounded-2xl font-bold shadow-lg">Ready Up</button>
+        </div>
+
+        <div id="game-view" class="hidden">
+            <div class="h-2 w-full bg-gray-100 rounded-full mb-8 overflow-hidden">
+                <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <h3 id="question-text" class="text-2xl font-bold mb-8 text-gray-800 min-h-[100px]"></h3>
+            <div id="options-container" class="space-y-3"></div>
+        </div>
+
+    </div>
+</body>
+</html>
