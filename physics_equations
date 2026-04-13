@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A/L Physics Equations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+        }
+
+        .katex-display {
+            margin: 0.5em 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+
+    <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/20 text-white">
+                        <i data-lucide="atom" class="w-7 h-7 animate-spin-slow"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500">
+                            A/L Physics Equations
+                        </h1>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">සමීකරණ</p>
+                    </div>
+                </div>
+                
+                <div class="relative group w-full lg:w-96">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 w-5 h-5 transition-colors"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="සමීකරණ හෝ විෂය ඒකක සොයන්න..."
+                        class="w-full pl-12 pr-6 py-3 bg-slate-100 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all shadow-inner"
+                    >
+                </div>
+            </div>
+
+            <div id="categoryContainer" class="mt-6 flex overflow-x-auto pb-2 gap-3 no-scrollbar">
+                <!-- Categories will be injected here -->
+            </div>
+        </div>
+    </header>
+
+    <main id="mainContent" class="max-w-7xl mx-auto px-4 py-10">
+        <!-- Physics data will be injected here -->
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4 text-center">
+            <p class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.2em]">
+                Physics A/L Equations Database • Sri Lanka
+            </p>
+            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-blue-500 hover:text-blue-600 text-sm font-semibold">නැවත ඉහළට</button>
+        </div>
+    </footer>
+
+    <script>
+        const PHYSICS_DATA = [
+            {
+                id: 1,
+                title: "මිනුම් (Units and Measurements)",
+                icon: "gauge",
+                equations: [
+                    { formula: "\\rho = \\frac{m}{V}", label: "ඝනත්වය", details: "m - ස්කන්ධය, V - පරිමාව" },
+                    { formula: "\\text{භාගික දෝෂය} = \\frac{\\Delta x}{x}", label: "භාගික දෝෂය", details: "\\Delta x - දෝෂය, x - මිනුම" },
+                    { formula: "\\text{ප්‍රතිශත දෝෂය} = \\frac{\\Delta x}{x} \\times 100\\%", label: "ප්‍රතිශත දෝෂය", details: "භාගික දෝෂය ප්‍රතිශතයක් ලෙස" }
+                ]
+            },
+            {
+                id: 2,
+                title: "යාන්ත්‍ර විද්‍යාව (Mechanics)",
+                icon: "box",
+                equations: [
+                    { formula: "v = u + at", label: "චලිත සමීකරණය 1", details: "v - අවසාන ප්‍රවේගය, u - ආරම්භක ප්‍රවේගය, a - ත්වරණය, t - කාලය" },
+                    { formula: "s = ut + \\frac{1}{2}at^2", label: "චලිත සමීකරණය 2", details: "s - විස්ථාපනය" },
+                    { formula: "v^2 = u^2 + 2as", label: "චලිත සමීකරණය 3", details: "ත්වරණය සහ විස්ථාපනය අතර සම්බන්ධය" },
+                    { formula: "s = \\left(\\frac{u+v}{2}\\right)t", label: "චලිත සමීකරණය 4", details: "මධ්‍යන්‍ය ප්‍රවේගයෙන් විස්ථාපනය" },
+                    { formula: "F = ma", label: "නිව්ටන්ගේ 2 වන නියමය", details: "F - බලය, m - ස්කන්ධය, a - ත්වරණය" },
+                    { formula: "p = mv", label: "රේඛීය ගම්‍යතාව", details: "p - ගම්‍යතාව" },
+                    { formula: "J = F \\Delta t = \\Delta p", label: "ආවේගය", details: "J - ආවේගය, \\Delta p - ගම්‍යතාවයේ වෙනස" },
+                    { formula: "W = Fs \\cos \\theta", label: "කළ කාර්යය", details: "W - කාර්යය, \\theta - බලය සහ විස්ථාපනය අතර කෝණය" },
+                    { formula: "E_k = \\frac{1}{2}mv^2", label: "චාලක ශක්තිය", details: "චලිතය නිසා ඇතිවන ශක්තිය" },
+                    { formula: "E_p = mgh", label: "විභව ශක්තිය", details: "පිහිටීම නිසා ඇතිවන ශක්තිය" },
+                    { formula: "P = \\frac{W}{t} = Fv", label: "ක්ෂමතාව", details: "කාර්යය කිරීමේ සීඝ්‍රතාව" },
+                    { formula: "\\eta = \\frac{\\text{නිමැවුම් ක්ෂමතාව}}{\\text{ආදාන ක්ෂමතාව}} \\times 100\\%", label: "කාර්යක්ෂමතාව", details: "\\eta - යාන්ත්‍රික කාර්යක්ෂමතාව" },
+                    { formula: "\\omega = \\frac{\\theta}{t} = \\frac{v}{r}", label: "කෝණික ප්‍රවේගය", details: "\\omega - කෝණික ප්‍රවේගය, r - අරය" },
+                    { formula: "a = \\frac{v^2}{r} = r\\omega^2", label: "කේන්ද්‍රාභිසාරී ත්වරණය", details: "වෘත්ත චලිතයක කේන්ද්‍රය දෙසට ඇති ත්වරණය" },
+                    { formula: "F = \\frac{mv^2}{r} = mr\\omega^2", label: "කේන්ද්‍රාභිසාරී බලය", details: "වෘත්ත චලිතයක් පවත්වා ගැනීමට අවශ්‍ය බලය" },
+                    { formula: "\\tau = Fr \\sin \\theta", label: "ව්‍යාවර්තය (Torque)", details: "\\tau - බලඝූර්ණය" }
+                ]
+            },
+            {
+                id: 3,
+                title: "දෝලන සහ තරංග (Oscillations & Waves)",
+                icon: "radio",
+                equations: [
+                    { formula: "a = -\\omega^2 x", label: "සරල අනුවර්තී චලිතය (SHM)", details: "ත්වරණය විස්ථාපනයට ප්‍රතිවිරුද්ධ දිශාවට පවතී" },
+                    { formula: "x = A \\sin(\\omega t + \\phi)", label: "SHM විස්ථාපනය", details: "A - විස්තාරය, \\phi - ආරම්භක කලාව" },
+                    { formula: "T = \\frac{2\\pi}{\\omega} = \\frac{1}{f}", label: "ආවර්ත කාලය", details: "f - සංඛ්‍යාතය" },
+                    { formula: "T = 2\\pi \\sqrt{\\frac{l}{g}}", label: "සරල ඔසවනය", details: "l - ඔසවනයේ දිග" },
+                    { formula: "v = f\\lambda", label: "තරංග වේගය", details: "\\lambda - තරංග ආයාමය" },
+                    { formula: "I = \\frac{P}{A} \\propto A^2", label: "තරංග තීව්‍රතාව", details: "තීව්‍රතාව විස්තාරයේ වර්ගයට සමානුපාතික වේ" },
+                    { formula: "f' = f_s \\left( \\frac{v \\pm v_o}{v \\mp v_s} \\right)", label: "ඩොප්ලර් ආචරණය", details: "v - ශබ්දයේ වේගය, v_o - නිරීක්ෂක වේගය, v_s - ප්‍රභව වේගය" }
+                ]
+            },
+            {
+                id: 4,
+                title: "තාප විද්‍යාව (Thermal Physics)",
+                icon: "thermometer",
+                equations: [
+                    { formula: "\\Delta L = L_0 \\alpha \\Delta \\theta", label: "රේඛීය ප්‍රසාරණය", details: "\\alpha - රේඛීය ප්‍රසාරණතා සංගුණකය" },
+                    { formula: "Q = mc \\Delta \\theta", label: "තාප ධාරිතාව", details: "c - විශිෂ්ට තාප ධාරිතාව, m - ස්කන්ධය" },
+                    { formula: "Q = mL", label: "ගුප්ත තාපය", details: "L - විශිෂ්ට ගුප්ත තාපය" },
+                    { formula: "PV = nRT = NkT", label: "පරිපූර්ණ වායු සමීකරණය", details: "R - වායු නියතය, k - බෝල්ට්ස්මාන් නියතය" },
+                    { formula: "PV = \\frac{1}{3}Nmc\\overline{^2}", label: "වායූන්ගේ චාලක වාදය", details: "c\\overline{^2} - මධ්‍යන්‍ය වර්ග ප්‍රවේගය" },
+                    { formula: "E_k = \\frac{3}{2}kT", label: "අණුවක සාමාන්‍ය චාලක ශක්තිය", details: "නිරපේක්ෂ උෂ්ණත්වයට සෘජුව සමානුපාතික වේ" },
+                    { formula: "\\Delta Q = \\Delta U + \\Delta W", label: "තාපගති විද්‍යාවේ 1 වන නියමය", details: "ශක්ති සංස්ථිති නියමය" }
+                ]
+            },
+            {
+                id: 5,
+                title: "ක්ෂේත්‍ර (Fields)",
+                icon: "magnet",
+                equations: [
+                    { formula: "F = \\frac{Gm_1m_2}{r^2}", label: "නිව්ටන්ගේ ගුරුත්වාකර්ෂණ නියමය", details: "G - විශ්ව ගුරුත්වාකර්ෂණ නියතය" },
+                    { formula: "g = \\frac{GM}{r^2}", label: "ගුරුත්වාකර්ෂණ ක්ෂේත්‍ර තීව්‍රතාව", details: "ගුරුත්වජ ත්වරණය සඳහා පොදු සමීකරණය" },
+                    { formula: "V = -\\frac{GM}{r}", label: "ගුරුත්වාකර්ෂණ විභවය", details: "අනන්තයේදී විභවය ශූන්‍ය ලෙස සලකයි" },
+                    { formula: "F = \\frac{1}{4\\pi\\varepsilon_0} \\frac{q_1q_2}{r^2}", label: "කුලෝම් නියමය (විද්‍යුත් බලය)", details: "\\varepsilon_0 - අවකාශයේ පාරවේධ්‍යතාව" },
+                    { formula: "E = \\frac{F}{q} = \\frac{V}{d}", label: "විද්‍යුත් ක්ෂේත්‍ර තීව්‍රතාව", details: "V - විභව වෙනස, d - තහඩු අතර දුර" },
+                    { formula: "C = \\frac{Q}{V}", label: "ධාරිතාව", details: "C - ධාරිතාව (Farad)" },
+                    { formula: "C = \\frac{\\varepsilon_0 \\varepsilon_r A}{d}", label: "සමාන්තර තහඩු ධාරිත්‍රකය", details: "A - තහඩු වර්ගඵලය, d - පරතරය" },
+                    { formula: "E = \\frac{1}{2}QV = \\frac{1}{2}CV^2", label: "ධාරිත්‍රකයක ගබඩා වූ ශක්තිය", details: "විද්‍යුත් ක්ෂේත්‍රය ලෙස ශක්තිය ගබඩා වේ" },
+                    { formula: "F = Bqv \\sin \\theta", label: "චලනය වන ආරෝපණයක් මත බලය", details: "B - චුම්බක ස්‍රාව ඝනත්වය" },
+                    { formula: "F = BIL \\sin \\theta", label: "ධාරාධාරක සන්නායකයක් මත බලය", details: "L - සන්නායකයේ දිග" },
+                    { formula: "\\Phi = BA \\cos \\theta", label: "චුම්බක ස්‍රාවය", details: "\\Phi - චුම්බක ස්‍රාවය (Weber)" },
+                    { formula: "\\epsilon = -N \\frac{d\\Phi}{dt}", label: "ෆැරඩේ නියමය (ප්‍රේරිත e.m.f)", details: "N - දඟර වට ගණන" },
+                    { formula: "\\frac{V_s}{V_p} = \\frac{N_s}{N_p} = \\frac{I_p}{I_s}", label: "පරිණාමක (Transformer)", details: "s - ද්විතීයික, p - ප්‍රාථමික" }
+                ]
+            },
+            {
+                id: 6,
+                title: "ධාරා විද්‍යුතය (Current Electricity)",
+                icon: "zap",
+                equations: [
+                    { formula: "V = IR", label: "ඕම්ගේ නියමය", details: "R - ප්‍රතිරෝධය" },
+                    { formula: "R = \\frac{\\rho l}{A}", label: "ප්‍රතිරෝධය සහ ප්‍රතිරෝධකතාව", details: "\\rho - ප්‍රතිරෝධකතාව" },
+                    { formula: "R_{සමක} = R_1 + R_2 ...", label: "ශ්‍රේණිගත ප්‍රතිරෝධක", details: "ප්‍රතිරෝධයන්ගේ එකතුව" },
+                    { formula: "\\frac{1}{R_{සමක}} = \\frac{1}{R_1} + \\frac{1}{R_2} ...", label: "සමාන්තරගත ප්‍රතිරෝධක", details: "ප්‍රතිලෝමයන්ගේ එකතුව" },
+                    { formula: "P = VI = I^2R = \\frac{V^2}{R}", label: "විද්‍යුත් ක්ෂමතාව", details: "වැය වන විද්‍යුත් ශක්තියේ සීඝ්‍රතාව" },
+                    { formula: "\\sum I = 0", label: "කර්චොෆ්ගේ 1 වන නියමය (සන්ධි)", details: "ආරෝපණ සංස්ථිති නියමය" },
+                    { formula: "\\sum \\epsilon = \\sum IR", label: "කර්චොෆ්ගේ 2 වන නියමය (පුඩුව)", details: "ශක්ති සංස්ථිති නියමය" }
+                ]
+            },
+            {
+                id: 7,
+                title: "පදාර්ථය සහ විකිරණය (Matter & Radiation)",
+                icon: "atom",
+                equations: [
+                    { formula: "E = \\frac{\\text{ප්‍රත්‍යාබලය}}{\\text{වික්‍රියාව}} = \\frac{F/A}{e/L}", label: "යං මාපාංකය", details: "Stress - ප්‍රත්‍යාබලය, Strain - වික්‍රියාව" },
+                    { formula: "U = \\frac{1}{2}Fe", label: "ඇදුනු කම්බියක ශක්තිය", details: "e - ප්‍රසාරණය" },
+                    { formula: "E = hf = \\frac{hc}{\\lambda}", label: "ෆෝටෝන ශක්තිය", details: "h - ප්ලාන්ක් නියතය" },
+                    { formula: "hf = \\Phi + \\frac{1}{2}mv_{උපරිම}^2", label: "ප්‍රකාශ විද්‍යුත් සමීකරණය", details: "\\Phi - වැඩ ශ්‍රිතය" },
+                    { formula: "E = mc^2", label: "ස්කන්ධ-ශක්ති සම්බන්ධතාව", details: "අයින්ස්ටයින්ගේ සමීකරණය" },
+                    { formula: "A = \\lambda N", label: "විකිරණශීලී ක්‍රියාකාරීත්වය", details: "\\lambda - ක්ෂය නියතය, N - පරමාණු ගණන" },
+                    { formula: "N = N_0 e^{-\\lambda t}", label: "විකිරණශීලී ක්ෂය වීමේ නියමය", details: "N_0 - ආරම්භක පරමාණු ගණන" },
+                    { formula: "T_{1/2} = \\frac{\\ln 2}{\\lambda} \\approx \\frac{0.693}{\\lambda}", label: "අර්ධ ආයු කාලය", details: "ක්‍රියාකාරීත්වය අඩක් වීමට ගතවන කාලය" }
+                ]
+            }
+        ];
+
+        let activeCategory = 'සියල්ල';
+        let searchTerm = '';
+
+        function init() {
+            renderCategories();
+            renderContent();
+            setupEventListeners();
+            lucide.createIcons();
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoryContainer');
+            const categories = ['සියල්ල', ...PHYSICS_DATA.map(unit => unit.title)];
+            
+            container.innerHTML = categories.map(cat => `
+                <button
+                    onclick="setCategory('${cat}')"
+                    class="category-btn px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 ${
+                        activeCategory === cat 
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' 
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }"
+                    data-category="${cat}"
+                >
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function renderContent() {
+            const mainContent = document.getElementById('mainContent');
+            const filteredData = PHYSICS_DATA.map(unit => ({
+                ...unit,
+                equations: unit.equations.filter(eq => 
+                    eq.label.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                    eq.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    unit.title.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            })).filter(unit => 
+                (activeCategory === 'සියල්ල' || unit.title === activeCategory) && 
+                unit.equations.length > 0
+            );
+
+            if (filteredData.length === 0) {
+                mainContent.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-32 text-center">
+                        <div class="bg-slate-100 dark:bg-slate-800 p-8 rounded-full mb-6">
+                            <i data-lucide="search" class="w-12 h-12 text-slate-300"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">ප්‍රතිඵල නැත</h3>
+                        <p class="text-slate-500 max-w-xs">සමීකරණ පද්ධතියේ නැතහොත් වෙනත් නමකින් සොයා බලන්න.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            mainContent.innerHTML = filteredData.map(unit => `
+                <section class="fade-in-section mb-16">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 text-blue-500">
+                            <i data-lucide="${unit.icon}"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black text-slate-800 dark:text-white leading-tight">
+                                ${unit.title}
+                            </h2>
+                            <div class="h-1 w-12 bg-blue-500 rounded-full mt-1"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        ${unit.equations.map(eq => `
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all duration-300 group">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">
+                                        ${eq.label}
+                                    </div>
+                                    <i data-lucide="info" class="w-4 h-4 text-slate-300 group-hover:text-blue-400 cursor-help"></i>
+                                </div>
+                                
+                                <div class="my-2 text-xl md:text-2xl py-4 overflow-x-auto no-scrollbar min-h-[4rem] flex items-center justify-center text-slate-900 dark:text-white">
+                                    <div class="latex-container" data-formula="${eq.formula}"></div>
+                                </div>
+                                
+                                <div class="text-xs leading-relaxed text-slate-500 dark:text-slate-400 border-t border-slate-50 dark:border-slate-700 pt-3 italic">
+                                    ${eq.details}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
+            `).join('');
+
+            // Render Math
+            document.querySelectorAll('.latex-container').forEach(container => {
+                const formula = container.getAttribute('data-formula');
+                try {
+                    katex.render(formula, container, {
+                        throwOnError: false,
+                        displayMode: true
+                    });
+                } catch (e) {
+                    container.innerHTML = `<span class="text-red-500 text-xs">${formula}</span>`;
+                }
+            });
+
+            lucide.createIcons();
+            
+            // Intersection Observer for fade-in effect
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in-section').forEach(section => observer.observe(section));
+        }
+
+        function setCategory(cat) {
+            activeCategory = cat;
+            renderCategories();
+            renderContent();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchTerm = e.target.value;
+                renderContent();
+            });
+        }
+
+        // Initialize on load
+        window.onload = init;
+    </script>
+</body>
+</html>
