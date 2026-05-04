@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage Light Pro - Garrix '+' Edition</title>
+    <style>
+        :root {
+            --bg: #010103;
+            --accent: #00f2ff;
+            --panel: rgba(10, 10, 18, 0.85);
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background-color: var(--bg);
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            user-select: none;
+            /* Added for 3D POV perspective to work smoothly */
+            perspective: 1000px; 
+        }
+
+        body.hide-cursor {
+            cursor: none !important;
+        }
+
+        /* The canvas gets transitioned in JS for the POV effect */
+        canvas { 
+            display: block; 
+            width: 100%; 
+            height: 100%;
+            transition: transform 0.1s ease-out; 
+            will-change: transform;
+        }
+
+        .ui-element {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .ui-hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: translateY(20px) scale(0.95);
+        }
+        .status-badge.ui-hidden { transform: translateY(-20px) scale(0.95); }
+        #controls-hint.ui-hidden { transform: translateY(-20px) scale(0.95); }
+
+        #ui-layer {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 16px 24px;
+            display: flex;
+            gap: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.9);
+            z-index: 100;
+        }
+        #ui-layer.ui-hidden { transform: translateX(-50%) translateY(40px) scale(0.95); }
+
+        .group { display: flex; flex-direction: column; gap: 6px; }
+        .label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #888; font-weight: 900; }
+
+        .btn {
+            background: #1a1a25;
+            border: 1px solid #3a3a4a;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover { background: #2a2a3a; border-color: var(--accent); }
+        .btn.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 15px var(--accent); }
+
+        .meter-container {
+            width: 120px;
+            height: 6px;
+            background: #111;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        .meter-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.05s linear; }
+
+        #audio-name { font-size: 10px; color: var(--accent); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8; }
+
+        input[type="file"] { display: none; }
+        
+        .status-badge {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        .pulse { width: 12px; height: 12px; background: #0f0; border-radius: 50%; box-shadow: 0 0 15px #0f0; }
+        
+        select {
+            background: #1a1a25;
+            color: white;
+            border: 1px solid #3a3a4a;
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+            width: 140px;
+        }
+
+        #controls-hint {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            text-align: right;
+            line-height: 1.6;
+            z-index: 100;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 10px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="status-badge ui-element">
+        <div class="pulse" id="beat-indicator"></div>
+        <span id="mood-text" style="color: var(--accent)">READY</span>
+        <span id="ai-insight" style="font-size: 10px; color: #666; margin-left: 5px;">| SILENCE</span>
+    </div>
+
+    <div id="controls-hint" class="ui-element">
+        <b>PRO TIP</b><br>
+        Press <b>[M]</b> to toggle Menu & Cursor.<br>
+        In Wild Eye: <b>Arrows</b> to move, <b>+/-</b> to zoom.<br>
+        Logos appear at the end. Blackouts on silence.
+    </div>
+
+    <canvas id="stage"></canvas>
+
+    <div id="ui-layer" class="ui-element">
+        <div class="group">
+            <span class="label">Audio Source</span>
+            <label for="audio-upload" class="btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Load Audio
+            </label>
+            <input type="file" id="audio-upload" accept="audio/*">
+            <div id="audio-name">No track</div>
+        </div>
+
+        <div class="group">
+            <span class="label">AI Auto-VJ</span>
+            <button id="auto-btn" class="btn active">AUTO SYNC</button>
+            <div class="meter-container">
+                <div id="energy-meter" class="meter-fill"></div>
+            </div>
+        </div>
+
+        <div class="group">
+            <span class="label">Pattern Engine</span>
+            <select id="pattern-select"></select>
+        </div>
+
+        <div class="group">
+            <span class="label">Live Control</span>
+            <div style="display: flex; gap: 8px;">
+                <button id="strobe-btn" class="btn">STROBE FX</button>
+                <button id="pov-btn" class="btn" title="3D Crowd POV">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M2 12c0 0 3-7 10-7s10 7 10 7-3 7-10 7-10-7-10-7Z"/></svg>
+                    WILD EYE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('stage');
+        const ctx = canvas.getContext('2d', { alpha: false });
+        
+        let w, h;
+        let time = 0; 
+        let currentPattern = 0;
+        let isAuto = true;
+        let isStrobing = false;
+        
+        // Visibility Toggle
+        let uiVisible = true;
+
+        // Wild Eye (POV) State
+        let povMode = false;
+        let povZoom = 1.25;
+        let targetMouseX = 0, targetMouseY = 0;
+        let currentMouseX = 0, currentMouseY = 0;
+
+        // Advanced Audio Analysis & Timing
+        let audioCtx, analyzer, dataArray, source;
+        let audioDuration = 0;
+        let audioStartTime = 0;
+        let lastDropEndTime = 0;
+        let wasSpecialForced = false;
+
+        let energyHistory = new Array(60).fill(0); 
+        let stats = { 
+            bass: 0, mid: 0, high: 0, 
+            energy: 0, avgEnergy: 0, 
+            isDrop: false, isBuild: false
+        };
+        
+        let lastPatternChange = 0;
+        let lastPaletteChange = 0;
+        let globalHueOffset = 0; 
+        
+        // Laser Engine State
+        let isLasersActive = false;
+        let laserCooldown = 0;
+
+        // Color Palettes
+        const palettes = [
+            ['#00f2ff', '#0066ff', '#ffffff'], // Cyber Blue
+            ['#ff0055', '#ffaa00', '#220011'], // Magma
+            ['#00ff88', '#00ffa2', '#002211'], // Matrix Green
+            ['#7700ff', '#ff00ff', '#ffffff'], // Synthwave
+            ['#ffffff', '#444444', '#000000'], // Monochrome High-Contrast
+            ['#ff3300', '#ff9900', '#ffff00']  // Fire
+        ];
+        let currentPalette = palettes[0];
+
+        // Stage Layout Components
+        let crossPanels = [];
+        let movingHeads = [];
+
+        function init() {
+            resize();
+            populatePatterns();
+            render();
+        }
+
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+            createStageGeometry(); 
+            createMovingHeads();
+        }
+
+        function toggleUI() {
+            uiVisible = !uiVisible;
+            document.querySelectorAll('.ui-element').forEach(el => {
+                el.classList.toggle('ui-hidden', !uiVisible);
+            });
+            document.body.classList.toggle('hide-cursor', !uiVisible);
+        }
+
+        function createStageGeometry() {
+            crossPanels = [];
+            let minDim = Math.min(w, h);
+            let crossSize = minDim * 0.8; 
+            let thickness = crossSize * 0.28; 
+
+            let tX = crossSize / w;
+            let tY = crossSize / h;
+            let thX = thickness / w;
+            let thY = thickness / h;
+
+            let cx = 0.5, cy = 0.45;
+
+            crossPanels.push({ x: cx - thX/2, y: cy - tY/2, width: thX, height: tY });
+            crossPanels.push({ x: cx - tX/2, y: cy - thY/2, width: tX, height: thY });
+        }
+
+        function createMovingHeads() {
+            movingHeads = [];
+            let cx = 0.5; let cy = 0.45;
+            let tX = (Math.min(w, h) * 0.8) / w;
+            let tY = (Math.min(w, h) * 0.8) / h;
+            let thX = ((Math.min(w, h) * 0.8) * 0.28) / w;
+            let thY = ((Math.min(w, h) * 0.8) * 0.28) / h;
+
+            for(let i=0; i<10; i++) {
+                let px = (cx - tX/2) + (tX * (i/9));
+                if(Math.abs(px - cx) > thX/2 + 0.01) movingHeads.push({ x: px, y: cy - thY/2, baseAngle: -Math.PI/2, speed: 1.2, phase: i, colorIdx: 0 });
+            }
+            for(let i=0; i<10; i++) {
+                let px = (cx - tX/2) + (tX * (i/9));
+                if(Math.abs(px - cx) > thX/2 + 0.01) movingHeads.push({ x: px, y: cy + thY/2, baseAngle: Math.PI/2, speed: 1.5, phase: i + 3, colorIdx: 1 });
+            }
+            for(let i=0; i<6; i++) {
+                let py = (cy - tY/2) + (tY * (i/5));
+                if(Math.abs(py - cy) > thY/2 + 0.01) movingHeads.push({ x: cx - thX/2, y: py, baseAngle: Math.PI, speed: 1.8, phase: i*2, colorIdx: 2 });
+            }
+            for(let i=0; i<6; i++) {
+                let py = (cy - tY/2) + (tY * (i/5));
+                if(Math.abs(py - cy) > thY/2 + 0.01) movingHeads.push({ x: cx + thX/2, y: py, baseAngle: 0, speed: 1.8, phase: i*2+1, colorIdx: 0 });
+            }
+            for(let i=0; i<16; i++) {
+                movingHeads.push({ x: 0.05 + i*0.06, y: 0.95, baseAngle: -Math.PI/2, speed: 2.2, phase: i*0.8, colorIdx: 1 });
+            }
+        }
+
+        const patterns = [
+            { 
+                name: "Neural Nexus", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    let layers = 5 + Math.floor(s.energy * 5);
+                    for(let j=0; j<layers; j++) {
+                        ctx.rotate(t * 0.001 + (j * 0.2));
+                        ctx.strokeStyle = currentPalette[j % 2];
+                        ctx.lineWidth = 2 + s.bass * 25;
+                        ctx.beginPath();
+                        let radius = (50 + j * 50) * (1 + s.bass * 0.2);
+                        for(let i=0; i<6; i++) {
+                            let a = (i/6) * Math.PI * 2;
+                            let x = Math.cos(a) * radius;
+                            let y = Math.sin(a) * radius;
+                            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                        }
+                        ctx.closePath(); ctx.stroke();
+                    }
+                }
+            },
+            {
+                name: "Supernova", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    let particles = 60;
+                    for(let i=0; i<particles; i++) {
+                        let a = (i/particles) * Math.PI * 2 + (t*0.0005);
+                        let speed = (t * 0.4 + i * 15) % (w/1.5);
+                        let dist = speed * (1 + s.bass * 1.5); 
+                        let x = Math.cos(a) * dist;
+                        let y = Math.sin(a) * dist;
+                        ctx.fillStyle = currentPalette[i % currentPalette.length];
+                        let size = (8 + s.high * 40) * Math.max(0, (1 - dist/(w/2)));
+                        ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI*2); ctx.fill();
+                    }
+                }
+            },
+            {
+                name: "Hexagon Pulse", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    let layers = 4 + Math.floor(s.energy * 6);
+                    let rotationSpeed = t * 0.0005;
+                    for(let j=0; j<layers; j++) {
+                        ctx.rotate(rotationSpeed + (j * 0.1));
+                        ctx.strokeStyle = currentPalette[j % currentPalette.length];
+                        ctx.lineWidth = 3 + s.high * 15;
+                        ctx.beginPath();
+                        let radius = (30 + j * 45) * (1 + s.bass * 0.6); 
+                        for(let i=0; i<6; i++) {
+                            let a = (i/6) * Math.PI * 2;
+                            let x = Math.cos(a) * radius;
+                            let y = Math.sin(a) * radius;
+                            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                        }
+                        ctx.closePath(); ctx.stroke();
+                    }
+                }
+            },
+            {
+                name: "Circular EQ", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    let bands = 40;
+                    let radius = w * 0.08 * (1 + s.bass*0.2);
+                    ctx.rotate(t*0.001);
+                    for(let i=0; i<bands; i++) {
+                        let a = (i/bands) * Math.PI * 2;
+                        let bandBounce = (Math.sin(i * 13.5 + t * 0.01) * 0.5 + 0.5) * s.energy;
+                        let lineLen = 10 + bandBounce * 250 * (1 + s.bass*1.5);
+                        
+                        ctx.strokeStyle = currentPalette[i % currentPalette.length];
+                        ctx.lineWidth = (w*0.006) * (1 + s.high * 2);
+                        ctx.beginPath();
+                        ctx.moveTo(Math.cos(a)*radius, Math.sin(a)*radius);
+                        ctx.lineTo(Math.cos(a)*(radius+lineLen), Math.sin(a)*(radius+lineLen));
+                        ctx.stroke();
+                    }
+                }
+            },
+            {
+                name: "Pulse Star", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    let points = 8;
+                    let innerRad = w*0.05 * (1 + s.energy);
+                    let outerRad = innerRad + (w*0.1 * s.bass * 2);
+                    ctx.fillStyle = currentPalette[0];
+                    ctx.beginPath();
+                    for(let i=0; i<points*2; i++) {
+                        let rad = (i%2===0) ? outerRad : innerRad;
+                        let angle = (i/(points*2)) * Math.PI*2 + (t*0.001);
+                        let x = Math.cos(angle)*rad;
+                        let y = Math.sin(angle)*rad;
+                        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.strokeStyle = currentPalette[1] || '#fff';
+                    ctx.lineWidth = 5 + s.bass * 10;
+                    ctx.stroke();
+                }
+            },
+            {
+                name: "Spectrum Bars", special: false,
+                draw: (ctx, t, s) => {
+                    let bars = 30;
+                    let barW = (w*0.8)/bars;
+                    ctx.translate(w/2, h/2);
+                    for(let i=0; i<bars; i++) {
+                        let val = Math.abs(Math.sin(i*0.5 + t*0.01)) * s.energy;
+                        if(i%3===0) val *= (1 + s.bass * 1.5);
+                        let barH = 20 + val * h * 0.5;
+                        let x = -w*0.4 + (i*barW);
+                        ctx.fillStyle = currentPalette[i % currentPalette.length];
+                        ctx.fillRect(x, -barH/2, barW*0.7, barH);
+                    }
+                }
+            },
+            {
+                name: "Echo Rings", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    for(let i=0; i<8; i++) {
+                        let spread = (t*0.2 + i*200) % 1000;
+                        let radius = spread * (1 + s.bass * 0.5);
+                        let alpha = 1 - (spread/1000);
+                        ctx.globalAlpha = Math.max(0, alpha);
+                        ctx.strokeStyle = currentPalette[i % 3];
+                        ctx.lineWidth = 10 * (1 + s.energy);
+                        ctx.beginPath();
+                        ctx.arc(0, 0, radius, 0, Math.PI*2);
+                        ctx.stroke();
+                    }
+                    ctx.globalAlpha = 1.0;
+                }
+            },
+            { 
+                name: "Shatter Web", special: false,
+                draw: (ctx, t, s) => {
+                    let pnts = [];
+                    for(let i=0; i<20; i++) {
+                        pnts.push({
+                            x: w/2 + Math.cos(i*1.3 + t*0.001)*w*(0.2+s.bass*0.3),
+                            y: h/2 + Math.sin(i*1.7 + t*0.0012)*h*(0.2+s.bass*0.3)
+                        });
+                    }
+                    ctx.strokeStyle = currentPalette[0];
+                    ctx.lineWidth = 1 + s.energy*5;
+                    ctx.beginPath();
+                    for(let i=0; i<pnts.length; i++) {
+                        for(let j=i+1; j<pnts.length; j++) {
+                            if(Math.random() > 0.6) continue;
+                            ctx.moveTo(pnts[i].x, pnts[i].y);
+                            ctx.lineTo(pnts[j].x, pnts[j].y);
+                        }
+                    }
+                    ctx.stroke();
+                }
+            },
+            { 
+                name: "Fractal Web", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    let pnts = 8;
+                    let rad = w * 0.3 * (0.5 + s.energy*0.5);
+                    ctx.beginPath();
+                    for(let j=0; j<6; j++) { 
+                        let scale = 1 - (j * 0.12);
+                        ctx.strokeStyle = currentPalette[j % 3];
+                        ctx.lineWidth = 2 + s.bass * 10;
+                        for(let i=0; i<=pnts; i++) {
+                            let a = (i/pnts) * Math.PI * 2 + (t*0.001 * (j%2==0?1:-1));
+                            let x = Math.cos(a) * rad * scale;
+                            let y = Math.sin(a) * rad * scale;
+                            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                        }
+                        ctx.stroke();
+                    }
+                }
+            },
+            {
+                name: "Hyperspace Rings", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    for(let i=0; i<10; i++) {
+                        let rad = ((t * 0.3 + i * 150) % 1500) * (1 + s.bass * 0.5);
+                        ctx.beginPath();
+                        ctx.arc(0, 0, rad, 0, Math.PI*2);
+                        ctx.strokeStyle = currentPalette[i % 3];
+                        ctx.lineWidth = 4 + s.high * 30;
+                        ctx.stroke();
+                    }
+                }
+            },
+            { 
+                name: "Digital Rain", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.fillStyle = currentPalette[0];
+                    let cols = 40; let cw = w / cols;
+                    for(let i=0; i<cols; i++) {
+                        let h_ = (Math.sin(t * 0.01 + i) * 0.5 + 0.5) * h * s.energy * (1+s.bass);
+                        ctx.globalAlpha = 0.4 + (s.mid * 0.6);
+                        ctx.fillRect(i * cw, (h - h_)/2, cw - 2, h_);
+                    }
+                    ctx.globalAlpha = 1;
+                }
+            },
+            {
+                name: "Glitch Grid", special: false,
+                draw: (ctx, t, s) => {
+                    let size = w*0.05;
+                    for(let x=0; x<w; x+=size) {
+                        for(let y=0; y<h; y+=size) {
+                            if(Math.random() < s.energy * 0.1) {
+                                ctx.fillStyle = currentPalette[Math.floor(Math.random()*currentPalette.length)];
+                                let glitchX = x + (Math.random()-0.5)*s.bass*50;
+                                let glitchY = y + (Math.random()-0.5)*s.bass*50;
+                                ctx.fillRect(glitchX, glitchY, size*0.8, size*0.8);
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                name: "Laser Whips", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    let whips = 5 + Math.floor(s.energy * 10);
+                    for(let i=0; i<whips; i++) {
+                        ctx.beginPath();
+                        ctx.moveTo(0,0);
+                        let ctrlX = Math.cos(t*0.002 + i)*w*0.8;
+                        let ctrlY = Math.sin(t*0.0015 + i)*h*0.8;
+                        let endX = Math.cos(t*0.001 + i*1.5)*w*1.2;
+                        let endY = Math.sin(t*0.0025 + i*1.5)*h*1.2;
+                        ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
+                        ctx.strokeStyle = currentPalette[i % currentPalette.length];
+                        ctx.lineWidth = 3 + s.bass * 15;
+                        ctx.stroke();
+                    }
+                }
+            },
+            { 
+                name: "Vortex Tunnel", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    for(let i=0; i<25; i++) {
+                        let scale = ((t * 0.15 + i * 40) % 1000) / 1000;
+                        let size = scale * w * 1.5;
+                        ctx.rotate(s.bass * 0.2);
+                        ctx.strokeStyle = currentPalette[i % 2];
+                        ctx.lineWidth = 3 + s.high * 25;
+                        ctx.strokeRect(-size/2, -size/2, size, size);
+                    }
+                }
+            },
+            {
+                name: "Strobe Blocks", special: false,
+                draw: (ctx, t, s) => {
+                    let cols = 12; let rows = 8;
+                    let bw = w/cols; let bh = h/rows;
+                    for(let i=0; i<cols*rows; i++) {
+                        if(Math.random() < s.energy * 0.6) {
+                            ctx.fillStyle = currentPalette[Math.floor(Math.random()*currentPalette.length)];
+                            ctx.fillRect((i%cols)*bw, Math.floor(i/cols)*bh, bw, bh);
+                        }
+                    }
+                }
+            },
+            {
+                name: "Neon Waves", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.lineWidth = 8 + s.bass * 30;
+                    for(let i=0; i<6; i++) {
+                        ctx.strokeStyle = currentPalette[i % 3];
+                        ctx.beginPath();
+                        for(let x=0; x<w; x+=20) {
+                            let y = h/2 + Math.sin(x*0.01 + t*0.005 + i) * (100 + s.bass*300);
+                            if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                        }
+                        ctx.stroke();
+                    }
+                }
+            },
+            {
+                name: "Bass Orbs", special: false,
+                draw: (ctx, t, s) => {
+                    ctx.translate(w/2, h/2);
+                    let count = 8;
+                    for(let i=0; i<count; i++) {
+                        let a = (i/count)*Math.PI*2 + t*0.001;
+                        let dist = w*0.1 + s.bass*w*0.3;
+                        let x = Math.cos(a)*dist;
+                        let y = Math.sin(a)*dist;
+                        let r = w*0.02 + s.energy*w*0.1;
+                        ctx.fillStyle = currentPalette[i%currentPalette.length];
+                        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+                    }
+                }
+            },
+            {
+                name: "Garrix Text", special: true,
+                draw: (ctx, t, s) => {
+                    ctx.fillStyle = currentPalette[0];
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.font = `900 ${w*0.08}px 'Segoe UI', Arial, sans-serif`;
+                    let pulse = 1 + s.bass * 0.2;
+                    ctx.scale(pulse, pulse);
+                    ctx.fillText("MARTIN GARRIX", 0, 0); 
+                }
+            },
+            {
+                name: "Logo +x", special: true,
+                draw: (ctx, t, s) => {
+                    ctx.strokeStyle = currentPalette[1] || '#fff';
+                    ctx.lineWidth = w*0.02 + s.bass * w*0.02;
+                    ctx.lineCap = "square";
+                    
+                    let size = w*0.06;
+                    let gap = w*0.05; 
+                    
+                    let pX = - gap - size/2; 
+                    let xX = gap + size/2; 
+                    
+                    if(s.bass > 0.8) {
+                        pX += (Math.random()-0.5)*15;
+                        xX += (Math.random()-0.5)*15;
+                    }
+
+                    ctx.beginPath();
+                    ctx.moveTo(pX, - size); ctx.lineTo(pX, size);
+                    ctx.moveTo(pX - size, 0); ctx.lineTo(pX + size, 0);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(xX - size*0.8, - size*0.8); ctx.lineTo(xX + size*0.8, size*0.8);
+                    ctx.moveTo(xX + size*0.8, - size*0.8); ctx.lineTo(xX - size*0.8, size*0.8);
+                    ctx.stroke();
+                }
+            }
+        ];
+
+        function populatePatterns() {
+            const select = document.getElementById('pattern-select');
+            patterns.forEach((p, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = p.name + (p.special ? " (Rare)" : "");
+                select.appendChild(opt);
+            });
+            select.onchange = (e) => { 
+                currentPattern = parseInt(e.target.value); 
+                isAuto = false; 
+                document.getElementById('auto-btn').classList.remove('active'); 
+                lastPatternChange = Date.now();
+                wasSpecialForced = false;
+            };
+        }
+
+        async function handleAudio(file) {
+            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if(source) source.disconnect();
+
+            const buf = await file.arrayBuffer();
+            const audioBuf = await audioCtx.decodeAudioData(buf);
+            
+            source = audioCtx.createBufferSource();
+            source.buffer = audioBuf;
+            analyzer = audioCtx.createAnalyser();
+            analyzer.fftSize = 512;
+            source.connect(analyzer);
+            analyzer.connect(audioCtx.destination);
+            dataArray = new Uint8Array(analyzer.frequencyBinCount);
+            
+            audioDuration = audioBuf.duration;
+            audioStartTime = audioCtx.currentTime;
+            lastDropEndTime = 0;
+            
+            source.start();
+            document.getElementById('audio-name').textContent = file.name;
+            document.getElementById('mood-text').textContent = "ANALYZING...";
+
+            // Auto-hide menu when track successfully starts playing
+            if(uiVisible) toggleUI();
+        }
+
+        function updateAudioLogic() {
+            if(!analyzer) return;
+            analyzer.getByteFrequencyData(dataArray);
+            
+            let b = 0, m = 0, h_ = 0;
+            for(let i=0; i<8; i++) b += dataArray[i];
+            for(let i=8; i<64; i++) m += dataArray[i];
+            for(let i=64; i<128; i++) h_ += dataArray[i];
+            
+            stats.bass = b / (8 * 255);
+            stats.mid = m / (56 * 255);
+            stats.high = h_ / (64 * 255);
+            
+            let currentEnergy = (stats.bass * 1.5 + stats.mid * 0.8 + stats.high * 0.7) / 3;
+            stats.energy = currentEnergy;
+
+            energyHistory.push(currentEnergy);
+            energyHistory.shift();
+            stats.avgEnergy = energyHistory.reduce((a,b) => a+b) / energyHistory.length;
+
+            document.getElementById('energy-meter').style.width = Math.min(100, stats.energy * 100) + '%';
+            const indicator = document.getElementById('beat-indicator');
+            indicator.style.transform = `scale(${1 + stats.bass * 0.8})`;
+            indicator.style.backgroundColor = stats.bass > 0.85 ? '#fff' : '#0f0';
+            indicator.style.boxShadow = `0 0 ${15 + stats.bass*20}px ${stats.bass > 0.85 ? '#fff' : '#0f0'}`;
+
+            const insight = document.getElementById('ai-insight');
+            const mood = document.getElementById('mood-text');
+            
+            if(currentEnergy > stats.avgEnergy * 1.4 && currentEnergy < 0.85) {
+                stats.isBuild = true;
+                insight.textContent = "| BUILD-UP";
+                mood.style.color = "#ffaa00";
+            } else {
+                stats.isBuild = false;
+            }
+
+            let wasDrop = stats.isDrop;
+            stats.isDrop = (currentEnergy > 0.8 && stats.bass > 0.85);
+
+            if (!stats.isDrop && wasDrop) {
+                lastDropEndTime = Date.now();
+            }
+
+            if(stats.isDrop) {
+                insight.textContent = "| DROP !!!";
+                mood.textContent = "INTENSE";
+                mood.style.color = "#ff0055";
+                
+                if(!wasDrop) {
+                    isStrobing = true;
+                    setTimeout(() => isStrobing = false, 150);
+
+                    if (isAuto && !wasSpecialForced && (Date.now() - lastPatternChange > 2000)) {
+                        let standardPatterns = patterns.map((p, i) => !p.special ? i : -1).filter(i => i !== -1);
+                        currentPattern = standardPatterns[Math.floor(Math.random() * standardPatterns.length)];
+                        document.getElementById('pattern-select').value = currentPattern;
+                        lastPatternChange = Date.now();
+                    }
+                }
+
+                // Rapid color changing during long heavy drops
+                if (Date.now() - lastPaletteChange > 250) {
+                    currentPalette = palettes[Math.floor(Math.random() * palettes.length)];
+                    lastPaletteChange = Date.now();
+                }
+
+            } else {
+                if(stats.energy > 0.05) {
+                    mood.style.color = stats.energy > 0.6 ? "#00ffa2" : "#00f2ff";
+                    mood.textContent = stats.energy > 0.6 ? "GROOVING" : "PLAYING";
+                    insight.textContent = "| " + Math.floor(stats.energy * 100) + "% ENRG";
+                } else {
+                    mood.textContent = "READY";
+                    insight.textContent = "| SILENCE";
+                }
+            }
+
+            if(stats.energy > 0.65) {
+                globalHueOffset += (stats.energy * 3); 
+            }
+
+            if(isAuto && stats.energy > 0.88 && stats.bass > 0.9) {
+                if(!isLasersActive && Date.now() - laserCooldown > 20000 && Math.random() > 0.8) {
+                    isLasersActive = true;
+                    laserCooldown = Date.now();
+                    setTimeout(() => isLasersActive = false, 10000); 
+                }
+            } else if (stats.energy < 0.5) {
+                isLasersActive = false; 
+            }
+
+            let playbackProgress = 0;
+            if (audioDuration > 0) {
+                playbackProgress = Math.min(1, (audioCtx.currentTime - audioStartTime) / audioDuration);
+            }
+
+            if (isAuto) {
+                let isNearEnd = (playbackProgress > 0.85 && playbackProgress < 0.99);
+
+                if (isNearEnd) {
+                    if (!wasSpecialForced) {
+                        // Dynamically find special pattern indices instead of hardcoding
+                        let specialPatterns = patterns.map((p, i) => p.special ? i : -1).filter(i => i !== -1);
+                        currentPattern = specialPatterns[Math.floor(Math.random() * specialPatterns.length)];
+                        document.getElementById('pattern-select').value = currentPattern;
+                        wasSpecialForced = true;
+                    }
+                    lastPatternChange = Date.now(); 
+                } else {
+                    if (wasSpecialForced) {
+                        wasSpecialForced = false;
+                        lastPatternChange = 0; 
+                    }
+
+                    if(Date.now() - lastPatternChange > 12000) {
+                        if(Math.random() > 0.4) {
+                            let standardPatterns = patterns.map((p, i) => !p.special ? i : -1).filter(i => i !== -1);
+                            currentPattern = standardPatterns[Math.floor(Math.random() * standardPatterns.length)];
+                            document.getElementById('pattern-select').value = currentPattern;
+                            lastPatternChange = Date.now();
+                        }
+                    }
+                }
+            }
+        }
+
+        function render() {
+            updateAudioLogic();
+
+            let isPlaying = source && audioCtx && audioCtx.state === 'running';
+            let isBlackout = isPlaying && stats.energy < 0.03 && !stats.isDrop;
+
+            if (povMode) {
+                currentMouseX += (targetMouseX - currentMouseX) * 0.08;
+                currentMouseY += (targetMouseY - currentMouseY) * 0.08;
+                
+                let bobX = Math.sin(time * 0.001) * 0.02;
+                let bobY = Math.cos(time * 0.0015) * 0.02;
+
+                let rotY = (currentMouseX + bobX) * 35; 
+                let rotX = -(currentMouseY + bobY) * 20; 
+                
+                let pump = povZoom + (stats.bass * 0.05);
+
+                canvas.style.transform = `scale(${pump}) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(${stats.bass * 25}px)`;
+                canvas.style.transformOrigin = "50% 85%"; 
+            } else {
+                canvas.style.transform = "none";
+                currentMouseX = 0; currentMouseY = 0;
+            }
+            
+            ctx.fillStyle = '#010103';
+            ctx.fillRect(0, 0, w, h);
+
+            // Handle Blackout logic when there is absolute silence in the middle of a playing track
+            if (isBlackout) {
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                crossPanels.forEach(p => {
+                    ctx.rect(p.x * w, p.y * h, p.width * w, p.height * h);
+                });
+                ctx.stroke();
+                drawDJ();
+                time += 2;
+                requestAnimationFrame(render);
+                return; 
+            }
+
+            drawBeams();
+            drawLasers();
+
+            const buffer = document.createElement('canvas');
+            buffer.width = w; buffer.height = h;
+            const bCtx = buffer.getContext('2d');
+
+            if(isStrobing || (isAuto && stats.energy > 0.95 && Math.random() > 0.8)) {
+                bCtx.fillStyle = '#ffffff';
+                bCtx.fillRect(0,0,w,h);
+            } else {
+                bCtx.save();
+                bCtx.filter = `hue-rotate(${globalHueOffset}deg) saturate(${100 + stats.energy * 50}%)`;
+                if(patterns[currentPattern].special) {
+                    bCtx.translate(w/2, h * 0.45); 
+                }
+                patterns[currentPattern].draw(bCtx, time, stats);
+                bCtx.restore();
+            }
+
+            ctx.save();
+            ctx.beginPath();
+            crossPanels.forEach(p => {
+                ctx.rect(p.x * w, p.y * h, p.width * w, p.height * h);
+            });
+            ctx.clip(); 
+            
+            ctx.drawImage(buffer, 0, 0);
+
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            for(let i=0; i<h; i+=6) ctx.fillRect(0, i, w, 2); 
+            for(let i=0; i<w; i+=6) ctx.fillRect(i, 0, 2, h); 
+            
+            ctx.restore(); 
+
+            ctx.strokeStyle = '#08080c';
+            ctx.lineWidth = 14;
+            ctx.beginPath();
+            crossPanels.forEach(p => {
+                ctx.rect(p.x * w, p.y * h, p.width * w, p.height * h);
+            });
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            drawDJ();
+
+            if(stats.bass > 0.5) {
+                ctx.globalCompositeOperation = 'screen';
+                let g = ctx.createRadialGradient(w/2, h*0.45, 0, w/2, h*0.45, w*0.8);
+                bCtx.fillStyle = currentPalette[0];
+                bCtx.fillRect(0,0,1,1);
+                
+                g.addColorStop(0, currentPalette[0] + '22'); 
+                g.addColorStop(1, 'transparent');
+                
+                ctx.filter = `hue-rotate(${globalHueOffset}deg)`;
+                ctx.fillStyle = g;
+                ctx.fillRect(0,0,w,h);
+                ctx.filter = 'none';
+                ctx.globalCompositeOperation = 'source-over';
+            }
+
+            drawLasers(true);
+
+            let baseSpeed = 2;
+            let dynamicSpeed = stats.energy * 30 + stats.bass * 25; 
+            time += baseSpeed + dynamicSpeed;
+
+            requestAnimationFrame(render);
+        }
+
+        function drawBeams() {
+            ctx.globalCompositeOperation = 'screen';
+            if(stats.energy > 0.5) ctx.filter = `hue-rotate(${globalHueOffset}deg)`;
+
+            // Restored original perfect sweep speed calculation
+            movingHeads.forEach((mh, i) => {
+                let sweep = Math.sin(time * 0.0005 * mh.speed + mh.phase) * (0.3 + stats.energy * 0.5);
+                let targetAngle = mh.baseAngle + sweep;
+                
+                let startX = mh.x * w;
+                let startY = mh.y * h;
+                let length = h * 1.5;
+                let endX = startX + Math.cos(targetAngle) * length;
+                let endY = startY + Math.sin(targetAngle) * length;
+
+                let isWhiteStrobe = isStrobing && Math.random() > 0.5;
+                let col = isWhiteStrobe ? '#ffffff' : currentPalette[mh.colorIdx % currentPalette.length];
+                let beamWidth = (isWhiteStrobe ? 20 : 6) + stats.energy * 30;
+                
+                let grd = ctx.createLinearGradient(startX, startY, endX, endY);
+                grd.addColorStop(0, col + (isWhiteStrobe ? 'ff' : '99'));
+                grd.addColorStop(0.4, col + '11');
+                grd.addColorStop(1, 'transparent');
+
+                ctx.strokeStyle = grd;
+                ctx.lineWidth = beamWidth;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+
+                ctx.fillStyle = col;
+                ctx.beginPath();
+                ctx.arc(startX, startY, beamWidth * 0.5, 0, Math.PI*2);
+                ctx.fill();
+            });
+            ctx.filter = 'none';
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        function drawLasers(foreground = false) {
+            if(!isLasersActive) return;
+            ctx.globalCompositeOperation = 'screen';
+            
+            let laserColor = stats.high > 0.8 ? '#ffffff' : '#00ff88';
+            if(Math.random() > 0.9) laserColor = '#00f2ff';
+            
+            // Hard drops lock lasers into Red or Green mode
+            if (stats.isDrop && stats.bass > 0.9) {
+                laserColor = Math.random() > 0.5 ? '#ff0000' : '#00ff00';
+            }
+
+            ctx.strokeStyle = laserColor;
+            ctx.lineWidth = 2 + stats.energy * 3;
+
+            let cx = w/2, cy = h * 0.45;
+            let boothY = cy + (Math.min(w, h) * 0.8 * 0.28)/2;
+            let rayCount = 12;
+
+            let origins = [ {x: 0, y: h}, {x: w, y: h} ];
+            if(foreground) origins = [{x: cx, y: boothY}];
+
+            origins.forEach((origin, oIdx) => {
+                for(let i=0; i<rayCount; i++) {
+                    let scan = Math.sin(time * 0.01 + i + oIdx) * 0.5;
+                    let angle = -Math.PI + (Math.PI/rayCount) * i + scan;
+                    if(foreground) angle = -Math.PI*0.8 + (Math.PI*0.6/rayCount) * i + scan; 
+
+                    ctx.beginPath();
+                    ctx.moveTo(origin.x, origin.y);
+                    ctx.lineTo(origin.x + Math.cos(angle)*w*2, origin.y + Math.sin(angle)*w*2);
+                    
+                    ctx.globalAlpha = 0.6 + stats.bass * 0.4;
+                    ctx.stroke();
+                }
+            });
+            
+            ctx.globalAlpha = 1.0;
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        function drawDJ() {
+            let cx = w/2, cy = h * 0.45;
+            let boothW = w * 0.12, boothH = h * 0.04;
+            let boothX = cx - boothW/2;
+            let boothY = cy + (Math.min(w, h) * 0.8 * 0.28)/2 - boothH;
+
+            ctx.fillStyle = '#030305';
+            ctx.fillRect(boothX, boothY, boothW, boothH);
+
+            ctx.beginPath();
+            let djX = cx; 
+            let djY = boothY - h*0.015;
+            ctx.arc(djX, djY, w*0.012, 0, Math.PI*2);
+            ctx.fill();
+            
+            ctx.fillRect(djX - w*0.015, djY + h*0.01, w*0.03, h*0.03); 
+
+            ctx.strokeStyle = '#030305';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = w*0.006;
+            
+            if(stats.isDrop || stats.bass > 0.8) {
+                ctx.beginPath(); ctx.moveTo(djX - w*0.012, djY + h*0.015); ctx.lineTo(djX - w*0.03, djY - h*0.02); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(djX + w*0.012, djY + h*0.015); ctx.lineTo(djX + w*0.03, djY - h*0.02); ctx.stroke();
+            } else {
+                ctx.beginPath(); ctx.moveTo(djX - w*0.012, djY + h*0.015); ctx.lineTo(djX - w*0.02, djY + h*0.03); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(djX + w*0.012, djY + h*0.015); ctx.lineTo(djX + w*0.02, djY + h*0.03); ctx.stroke();
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('audio-upload').onchange = (e) => {
+            if(e.target.files[0]) handleAudio(e.target.files[0]);
+        };
+        
+        document.getElementById('auto-btn').onclick = (e) => { 
+            isAuto = !isAuto; 
+            e.target.classList.toggle('active', isAuto); 
+        };
+        
+        const strobeBtn = document.getElementById('strobe-btn');
+        strobeBtn.onmousedown = () => isStrobing = true;
+        strobeBtn.onmouseup = () => isStrobing = false;
+        strobeBtn.ontouchstart = () => isStrobing = true;
+        strobeBtn.ontouchend = () => isStrobing = false;
+
+        document.getElementById('pov-btn').onclick = (e) => {
+            povMode = !povMode;
+            e.currentTarget.classList.toggle('active', povMode);
+        };
+
+        // Keyboard & Mouse Controls
+        window.addEventListener('keydown', (e) => {
+            if(e.key.toLowerCase() === 'm') toggleUI();
+            
+            if(povMode) {
+                if(e.key === '=' || e.key === '+') povZoom = Math.min(3, povZoom + 0.1);
+                if(e.key === '-' || e.key === '_') povZoom = Math.max(0.5, povZoom - 0.1);
+                
+                const step = 0.15;
+                if(e.key === 'ArrowUp') targetMouseY = Math.max(1, targetMouseY - step);
+                if(e.key === 'ArrowDown') targetMouseY = Math.min(-1, targetMouseY + step);
+                if(e.key === 'ArrowLeft') targetMouseX = Math.max(1, targetMouseX - step);
+                if(e.key === 'ArrowRight') targetMouseX = Math.min(-1, targetMouseX + step);
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if(!povMode) return;
+            targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            targetMouseY = (e.clientY / window.innerHeight) * 2 - 1;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if(!povMode || e.touches.length === 0) return;
+            targetMouseX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+            targetMouseY = (e.touches[0].clientY / window.innerHeight) * 2 - 1;
+        });
+
+        window.addEventListener('resize', resize);
+        
+        init();
+    </script>
+</body>
+</html>
