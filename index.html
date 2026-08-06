@@ -1,195 +1,890 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="si" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A/L 2026 Countdown</title>
+    <title>ශුද්ධ ගණිතය - අ.පො.ස. (උ/පෙළ) විභාග සූදානම් පරීක්ෂණ ලැයිස්තුව | Pure Maths A/L Checklist</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Sinhala -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        math: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                        }
+                    },
+                    fontFamily: {
+                        sinhala: ['Noto Sans Sinhala', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'Noto Sans Sinhala', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root {
-            /* Purple palette from the image */
-            --bg-purple: #7b4397;
-            --bg-purple-dark: #5e3373;
-            --card-white: #ffffff;
-            --text-dark: #333333;
-            --text-secondary: #666666;
-        }
-
         body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
+            font-family: 'Noto Sans Sinhala', 'Plus Jakarta Sans', sans-serif;
+        }
+        .checkbox-custom {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.375rem;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            background-color: var(--bg-purple);
-            /* Creating the pattern effect using SVG as a background repeat */
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 86c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm66-3c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-46-45c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm54 0c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM57 7c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm-8 48c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM25 30c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm60 52c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM9 53c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm44 0c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm40 24c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM33 46c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm45 0c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM9 13c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm44 0c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm40 24c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%236e3c87' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
+            flex-shrink: 0;
         }
-
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 90%;
-            max-width: 600px;
-            position: relative;
+        .dark .checkbox-custom {
+            border-color: #475569;
         }
-
-        /* Profile/Logo Header */
-        .profile-badge {
-            background: white;
-            padding: 8px 24px 8px 12px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: -35px; /* Pull the card under it */
-            z-index: 10;
+        .checkbox-custom:checked {
+            background-color: #16a34a;
+            border-color: #16a34a;
         }
-
-        .avatar {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #7b4397, #5e3373);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            margin-right: 12px;
-            color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Emoji placeholder for hourglass logo */
-        .avatar::after {
-            content: '♾️';
-        }
-
-        .profile-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .profile-name {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--text-dark);
-            line-height: 1.2;
-        }
-
-        .profile-handle {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        /* Main White Card */
-        .card {
-            background: var(--card-white);
-            width: 100%;
-            padding: 80px 40px 60px 40px;
-            border-radius: 40px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-
-        .days-number {
-            font-size: 12rem;
+        .checkbox-custom:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
             font-weight: 900;
-            color: #222222;
-            line-height: 0.8;
-            margin: 0;
-            font-family: "Arial Black", sans-serif;
-            letter-spacing: -5px;
+            color: white;
+            font-size: 0.75rem;
         }
-
-        .days-label {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #666666;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 15px;
+        .completed-item {
+            text-decoration: line-through;
+            opacity: 0.65;
         }
-
-        .footer-tag {
-            margin-top: 40px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.8);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1rem;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
-        /* Responsive scaling */
-        @media (max-width: 480px) {
-            .days-number {
-                font-size: 8rem;
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
             }
-            .days-label {
-                font-size: 1.1rem;
+            .print-full {
+                width: 100% !important;
+                max-width: none !important;
+                box-shadow: none !important;
             }
-            .card {
-                padding: 60px 20px 40px 20px;
+            .card-body {
+                display: block !important;
             }
         }
     </style>
 </head>
-<body>
 
-    <div class="main-container">
-        <!-- Header Badge -->
-        <div class="profile-badge">
-            <div class="avatar"></div>
-            <div class="profile-info">
-                <span class="profile-name">Infinity Software Solutions</span>
-                <span class="profile-handle">@Exam_Countdown_Bot</span>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300 font-sinhala pb-16">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-math-600 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                    <i class="fa-solid me-0 fa-square-root-variable text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
+                        ශුද්ධ ගණිතය <span class="text-xs sm:text-sm font-normal text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/60 px-2 py-0.5 rounded-full border border-brand-200 dark:border-brand-800 ml-1">අ.පො.ස. (උ/පෙළ)</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Pure Mathematics Exam Preparation Checklist</p>
+                </div>
+            </div>
+
+            <!-- Action Controls Header -->
+            <div class="flex items-center space-x-2 sm:space-x-3 no-print">
+                <button id="btnPrint" title="ලැයිස්තුව මුද්‍රණය කරන්න (Print)" class="p-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-print text-lg"></i>
+                </button>
+                <button id="btnThemeToggle" title="තේමාව වෙනස් කරන්න (Dark/Light)" class="p-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i id="themeIcon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <button id="btnReset" title="සියල්ල යළි පිහිටුවන්න (Reset)" class="px-3 py-1.5 text-xs sm:text-sm bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 font-medium rounded-lg border border-red-200 dark:border-red-800/60 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-left text-xs"></i>
+                    <span class="hidden sm:inline">Reset</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        
+        <!-- Banner Hero Card -->
+        <div class="bg-gradient-to-r from-slate-900 via-math-900 to-slate-900 text-white rounded-2xl p-6 sm:p-8 mb-8 shadow-xl relative overflow-hidden border border-slate-800">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-white pointer-events-none">
+                <i class="fa-solid fa-calculator text-[220px]"></i>
+            </div>
+            
+            <div class="relative z-10">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <div class="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 text-xs font-semibold px-3 py-1 rounded-full border border-emerald-500/30 mb-3">
+                            <i class="fa-solid fa-circle-check"></i> 2026 උ/පෙළ පූර්ණ අධ්‍යයන මඟපෙන්වීම
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug">
+                            ශුද්ධ ගණිතය - විභාග සූදානම් පරීක්ෂණ ලැයිස්තුව
+                        </h2>
+                        <p class="text-slate-300 text-sm sm:text-base mt-2 max-w-2xl leading-relaxed">
+                            A/L Pure Maths ප්‍රශ්න පත්‍රයේ සෑම ප්‍රශ්නයකටම අදාළ සියලුම තියරි, පසුගිය විභාග ප්‍රශ්න සහ ප්‍රධාන ආකෘති සම්පූර්ණ කර ඔබේ ප්‍රගතිය සටහන් කරගන්න.
+                        </p>
+                    </div>
+
+                    <!-- Overall Counter Badge -->
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-white/15 flex flex-col items-center justify-center min-w-[170px]">
+                        <span class="text-xs text-slate-300 font-medium uppercase tracking-wider mb-1">සම්පූර්ණ ප්‍රගතිය</span>
+                        <div class="text-3xl sm:text-4xl font-extrabold text-emerald-400 flex items-baseline gap-1" id="overallPercent">
+                            0<span class="text-xl">%</span>
+                        </div>
+                        <span class="text-xs text-slate-300 mt-1" id="overallStats">0 / 0 අයිතම</span>
+                    </div>
+                </div>
+
+                <!-- Global Progress Bar -->
+                <div class="mt-6">
+                    <div class="w-full bg-slate-800/80 rounded-full h-3 overflow-hidden p-0.5 border border-slate-700/50">
+                        <div id="mainProgressBar" class="bg-gradient-to-r from-brand-500 to-emerald-400 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Main Card -->
-        <div class="card">
-            <div class="days-number" id="days-count">000</div>
-            <div class="days-label">Days Left</div>
+        <!-- Controls Toolbar (Search, Filter, Expand/Collapse) -->
+        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6 no-print">
+            <!-- Search Bar -->
+            <div class="relative flex-1">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInput" placeholder="මාතෘකාව, ප්‍රශ්නය හෝ තියරි සටහන සොයන්න..." 
+                    class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-sm">
+            </div>
+
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
+                <!-- Filter Buttons -->
+                <div class="inline-flex p-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium shadow-sm">
+                    <button id="filterAll" class="filter-btn px-3 py-1.5 rounded-lg bg-brand-600 text-white font-semibold transition">සියල්ල</button>
+                    <button id="filterPending" class="filter-btn px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 transition">නොකළ</button>
+                    <button id="filterCompleted" class="filter-btn px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 transition">සම්පූර්ණයි</button>
+                </div>
+
+                <!-- Expand/Collapse Button -->
+                <button id="btnToggleExpand" class="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium rounded-xl transition flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+                    <i class="fa-solid fa-up-right-and-down-left-from-center text-xs"></i>
+                    <span id="expandText">සියල්ල හකුළන්න</span>
+                </button>
+            </div>
         </div>
 
-        <!-- Footer -->
-        <div class="footer-tag">
-            Infinity SL 🇱🇰
+        <!-- Checklist Sections Grid/List Container -->
+        <div id="checklistContainer" class="space-y-4">
+            <!-- Dynamic Content Will Be Rendered Here via JavaScript -->
         </div>
-    </div>
+
+        <!-- Completion Modal (Triggered on 100% completion) -->
+        <div id="completionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-200 dark:border-slate-700 transform scale-95 transition-transform duration-300">
+                <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">සුබ පැතුම්! 🎉</h3>
+                <p class="text-slate-600 dark:text-slate-300 text-sm mb-6 leading-relaxed">
+                    ඔබ ශුද්ධ ගණිතය විභාග සූදානම් පරීක්ෂණ ලැයිස්තුවේ සියලුම කොටස් සාර්ථකව සම්පූර්ණ කර ඇත! විභාගයට ඉතා හොඳින් මුහුණ දී විශිෂ්ඨ සාමාර්ථයක් ලබා ගැනීමට ඔබට ශක්තිය ලැබේවා! 🙂
+                </p>
+                <button id="btnCloseModal" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition shadow-lg shadow-brand-500/30">
+                    ස්තූතියි! (ලැයිස්තුවට ආපසු)
+                </button>
+            </div>
+        </div>
+
+        <!-- Reset Confirmation Modal -->
+        <div id="resetModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-200 dark:border-slate-700">
+                <div class="w-14 h-14 bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">ප්‍රගතිය යළි පිහිටුවන්නද?</h3>
+                <p class="text-slate-600 dark:text-slate-300 text-xs mb-6">
+                    ඔබේ සියලුම ලකුණු කිරීම් ඉවත් වනු ඇත. මෙම ක්‍රියාව ආපසු හැරවිය නොහැක.
+                </p>
+                <div class="flex gap-3">
+                    <button id="btnCancelReset" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium text-sm rounded-xl transition">
+                        අවලංගු කරන්න
+                    </button>
+                    <button id="btnConfirmReset" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium text-sm rounded-xl transition shadow-md shadow-red-500/20">
+                        ඔව්, Reset කරන්න
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
     <script>
-        // Target date: GCE A/L 2026 (Approximately August 2026)
-        // Adjust the date as needed
-        const targetDate = new Date("August 10, 2026 00:00:00").getTime();
+        // Data structure containing the checklist translated into Sinhala
+        const checklistData = [
+            {
+                id: 'q1',
+                title: 'ප්‍රශ්නය 01 – ගණිත අනුමානය',
+                enTitle: 'Question 1 – Mathematical Induction',
+                items: [
+                    { id: 'q1_1', text: 'පටි ක්‍රමය (Tape Method) නැවත ආවර්ජනය කරන්න.' },
+                    { id: 'q1_2', text: 'සිග්මා (Σ) ප්‍රශ්න පුහුණු වන්න.' },
+                    { id: 'q1_3', text: 'බෙදියාම සම්බන්ධ සාධන පුහුණු වන්න.' },
+                    { id: 'q1_4', text: '2025 A/L පසුගිය විභාග ප්‍රශ්න පත්‍රය බලන්න.' },
+                    { id: 'q1_5', text: '2024 A/L පසුගිය විභාග ප්‍රශ්න පත්‍රය බලන්න.' }
+                ]
+            },
+            {
+                id: 'q2',
+                title: 'ප්‍රශ්නය 02 – මාපාංක (විශේෂ අගය) අසමානතා',
+                enTitle: 'Question 2 – Modulus (Absolute Value) Inequalities',
+                items: [
+                    { id: 'q2_1', text: 'පන්තියේදී සාකච්ඡා කළ සියලුම මාපාංක අසමානතා ප්‍රශ්න නැවත බලන්න.' },
+                    { id: 'q2_2', text: 'විවිධ ප්‍රශ්න රටා පුහුණු වන්න.' }
+                ]
+            },
+            {
+                id: 'q3',
+                title: 'ප්‍රශ්නය 03 – ආගන්ඩ් තලය',
+                enTitle: 'Question 3 – Argand Plane',
+                items: [
+                    { id: 'q3_1', text: '2025 A/L පසුගිය විභාග ප්‍රශ්න පත්‍රය බලන්න.' },
+                    { id: 'q3_2', text: 'තියරි සටහන නැවත ආවර්ජනය කරන්න.' },
+                    { id: 'q3_3', text: 'ඇඳීමට මතක තබා ගන්න: ආගන්ඩ් තලයේ වෘත්ත (Circles).' },
+                    { id: 'q3_4', text: 'ඇඳීමට මතක තබා ගන්න: වීඡාංක පථ / සරල රේඛීය පථ (Argument loci).' }
+                ]
+            },
+            {
+                id: 'q4',
+                title: 'ප්‍රශ්නය 04 – ද්විපද ප්‍රසාරණය',
+                enTitle: 'Question 4 – Binomial Expansion',
+                items: [
+                    { id: 'q4_1', text: 'ස්වායත්ත පදය (Independent term) සෙවීම නැවත බලන්න.' },
+                    { id: 'q4_2', text: 'විශේෂිත පදයක් (Specific term) සෙවීම නැවත බලන්න.' },
+                    { id: 'q4_3', text: 'පන්ති සටහන් නැවත බලන්න.' }
+                ]
+            },
+            {
+                id: 'q5',
+                title: 'ප්‍රශ්නය 05 – සීමා',
+                enTitle: 'Question 5 – Limits',
+                items: [
+                    { id: 'q5_1', text: 'ප්‍රධාන සීමා ප්‍රමේයයන් දෙක නැවත බලන්න.' },
+                    { id: 'q5_2', text: 'පන්තියේදී සාකච්ඡා කළ ප්‍රශ්න පුහුණු වන්න.' }
+                ]
+            },
+            {
+                id: 'q6',
+                title: 'ප්‍රශ්නය 06 – අවකලනයේ යෙදීම්',
+                enTitle: 'Question 6 – Applications of Derivatives',
+                items: [
+                    { id: 'q6_1', text: 'පරිමාව සම්බන්ධ උපරිම සහ අවම (Optimisation) ගැටලු නැවත බලන්න.' },
+                    { id: 'q6_2', text: 'පන්ති සටහන බලන්න.' }
+                ]
+            },
+            {
+                id: 'q7',
+                title: 'ප්‍රශ්නය 07 – ස්පර්ශකය සහ අභිලම්භය',
+                enTitle: 'Question 7 – Tangent and Normal',
+                items: [
+                    { id: 'q7_1', text: 'ස්පර්ශකය සහ අභිලම්භය සෙවීමේ සියලු ක්‍රම නැවත ආවර්ජනය කරන්න.' },
+                    { id: 'q7_2', text: 'පන්ති සටහන බලන්න.' }
+                ]
+            },
+            {
+                id: 'q8',
+                title: 'ප්‍රශ්නය 08 – සරල රේඛාව',
+                enTitle: 'Question 8 – Straight Line',
+                items: [
+                    { id: 'q8_1', text: 'සම්පූර්ණ තියරි සටහන නැවත ආවර්ජනය කරන්න.' },
+                    { id: 'q8_2', text: 'පසුගිය විභාග ප්‍රශ්න පුහුණු වන්න.' }
+                ]
+            },
+            {
+                id: 'q9',
+                title: 'ප්‍රශ්නය 09 – වෘත්තය',
+                enTitle: 'Question 9 – Circle',
+                items: [
+                    { id: 'q9_1', text: 'සම්පූර්ණ තියරි සටහන නැවත ආවර්ජනය කරන්න.' },
+                    { id: 'q9_2', text: 'A කොටසේ සහ රචනා (Essay) පසුගිය විභාග ප්‍රශ්න පුහුණු වන්න.' },
+                    { id: 'q9_3', text: 'සරල රේඛාව පාඩම සමඟ එකට නැවත ආවර්ජනය කරන්න.' }
+                ]
+            },
+            {
+                id: 'q10',
+                title: 'ප්‍රශ්නය 10 – ත්‍රිකෝණමිතිය',
+                enTitle: 'Question 10 – Trigonometry',
+                items: [
+                    { id: 'q10_1', text: 'ත්‍රිකෝණමිතික සමීකරණ විසඳීම පුහුණු වන්න.' },
+                    { id: 'q10_2', text: 'පසුගිය විභාග ප්‍රශ්න බලන්න.' },
+                    { id: 'q10_3', text: 'පොදු ප්‍රශ්න රටා සහ ආකෘති අධ්‍යයනය කරන්න.' }
+                ]
+            },
+            {
+                id: 'q11',
+                title: 'ප්‍රශ්නය 11 – රචනා ප්‍රශ්නය (Essay Question)',
+                enTitle: 'Question 11 – Essay Question',
+                subsections: [
+                    {
+                        subtitle: 'Part A – වර්ගජ සමීකරණ සහ ශ්‍රිත (Quadratic Equations & Functions)',
+                        items: [
+                            { id: 'q11_a1', text: 'වර්ගජ සමීකරණ ප්‍රශ්න රටා/ආකෘති නැවත බලන්න.' },
+                            { id: 'q11_a2', text: 'වර්ගජ ශ්‍රිතවල අවම සහ උපරිම අගයන් නැවත බලන්න.' },
+                            { id: 'q11_a3', text: 'පොදු මූල (Common roots) සම්බන්ධ ප්‍රශ්න නැවත බලන්න.' },
+                            { id: 'q11_a4', text: 'මූලයන්හි අනුපාත සම්බන්ධ ප්‍රශ්න නැවත බලන්න.' },
+                            { id: 'q11_a5', text: 'විවේචකය (Discriminant) - ප්‍රධාන ප්‍රශ්න රටා 4ම නැවත බලන්න.' },
+                            { id: 'q11_a6', text: 'වර්ගජ සමීකරණ ගොඩනැගීම නැවත බලන්න.' },
+                            { id: 'q11_a7', text: 'විපරිණාමන ක්‍රමය (Transformation method) නැවත බලන්න.' }
+                        ]
+                    },
+                    {
+                        subtitle: 'Part B – බහුපද ශ්‍රිත (Polynomial Functions)',
+                        items: [
+                            { id: 'q11_b1', text: 'ශේෂ ප්‍රමේයය (Remainder Theorem).' },
+                            { id: 'q11_b2', text: 'සාධක ප්‍රමේයය - සාධන ද ඇතුළත්ව (Factor Theorem).' },
+                            { id: 'q11_b3', text: 'පසුගිය විභාග ප්‍රශ්න පුහුණු වන්න.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'q12',
+                title: 'ප්‍රශ්නය 12 – රචනා ප්‍රශ්නය (Essay Question)',
+                enTitle: 'Question 12 – Essay Question',
+                subsections: [
+                    {
+                        subtitle: 'Part A – සංක්‍රමණය හා සංයෝජනය (Permutations & Combinations)',
+                        items: [
+                            { id: 'q12_a1', text: 'ක්‍රමය තෝරා ගැනීමට පෙර සෑම ප්‍රශ්නයක්ම අවධානයෙන් කියවන්න.' },
+                            { id: 'q12_a2', text: 'සියලුම ප්‍රශ්න රටා නැවත ආවර්ජනය කරන්න.' }
+                        ]
+                    },
+                    {
+                        subtitle: 'Part B – ශ්‍රේණි (Series)',
+                        items: [
+                            { id: 'q12_b1', text: 'පසුගිය විභාග ප්‍රශ්න පුහුණු වන්න.' },
+                            { id: 'q12_b2', text: 'මෙම කොටසට අදාළ භින්න භාග (Partial Fractions) නැවත බලන්න.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'q13',
+                title: 'ප්‍රශ්නය 13 – රචනා ප්‍රශ්නය (Essay Question)',
+                enTitle: 'Question 13 – Essay Question',
+                subsections: [
+                    {
+                        subtitle: 'Part A – න්‍යාස (Matrices)',
+                        items: [
+                            { id: 'q13_a1', text: 'වැදගත් ප්‍රමේයයන් නැවත ආවර්ජනය කරන්න.' },
+                            { id: 'q13_a2', text: 'සම්මත ප්‍රශ්න පුහුණු වන්න.' }
+                        ]
+                    },
+                    {
+                        subtitle: 'Part B – සංකීර්ණ සංඛ්‍යා (Complex Numbers)',
+                        items: [
+                            { id: 'q13_b1', text: 'සියලුම වැදගත් ප්‍රමේයයන් නැවත බලන්න.' },
+                            { id: 'q13_b2', text: 'අවශ්‍ය සාධන / ප්‍රතිඵල ලබා දීමට හැකි වන්න.' }
+                        ]
+                    },
+                    {
+                        subtitle: 'Part C – ඩි මෝවර්ගේ ප්‍රමේයය (De Moivre\'s Theorem)',
+                        items: [
+                            { id: 'q13_c1', text: 'පන්තියේ ගැටලු නැවත බලන්න.' },
+                            { id: 'q13_c2', text: 'පසුගිය විභාග ප්‍රශ්න පුහුණු වන්න.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'q14',
+                title: 'ප්‍රශ්නය 14 – ප්‍රස්ථාර (Graphs)',
+                enTitle: 'Question 14 – Graphs',
+                items: [
+                    { id: 'q14_1', text: 'මෙය ලකුණු පහසුවෙන් ලබාගත හැකි ප්‍රශ්නයකි - මගනෑරගන්න.' },
+                    { id: 'q14_2', text: 'එක සම්පූර්ණ උදාහරණයක් ඉතා හොඳින් අධ්‍යයනය කරන්න.' },
+                    { id: 'q14_3', text: 'පියවර කිසිවක් අතනෑර සෑම පියවරක්ම මතක තබා ගන්න.' },
+                    { id: 'q14_4', text: 'පන්තියේ සාකච්ඡා කළ අපෝහන (Deductions) නැවත ආවර්ජනය කරන්න.' }
+                ]
+            },
+            {
+                id: 'q15',
+                title: 'ප්‍රශ්නය 15 – අවකලනයේ යෙදීම් සහ අනුකලනය',
+                enTitle: 'Question 15 – Applications of Derivatives & Integration',
+                subsections: [
+                    {
+                        subtitle: 'අවකලනයේ යෙදීම් (Applications of Derivatives)',
+                        items: [
+                            { id: 'q15_d1', text: 'උපරිම සහ අවම ගැටලු නැවත බලන්න.' },
+                            { id: 'q15_d2', text: 'සූත්‍ර කටපාඩම් කරගන්න: ගෝලය (Sphere)' },
+                            { id: 'q15_d3', text: 'සූත්‍ර කටපාඩම් කරගන්න: අර්ධ ගෝලය (Hemisphere)' },
+                            { id: 'q15_d4', text: 'සූත්‍ර කටපාඩම් කරගන්න: ශංකුව (Cone)' },
+                            { id: 'q15_d5', text: 'සූත්‍ර කටපාඩම් කරගන්න: ඝනකය (Cube)' },
+                            { id: 'q15_d6', text: 'සූත්‍ර කටපාඩම් කරගන්න: වෘත්තාකාර රූප (වර්ගඵලය සහ පරිමාව)' }
+                        ]
+                    },
+                    {
+                        subtitle: 'අනුකලනය (Integration) – Part A',
+                        items: [
+                            { id: 'q15_i_a1', text: 'භින්න භාග (Partial Fractions).' },
+                            { id: 'q15_i_a2', text: 'ආදේශ ක්‍රමය - විශේෂයෙන් පෙර A/L ප්‍රශ්න (Substitution method).' }
+                        ]
+                    },
+                    {
+                        subtitle: 'අනුකලනය (Integration) – Part B',
+                        items: [
+                            { id: 'q15_i_b1', text: 'නියත අනුකලන සූත්‍රය (Definite Integration Formula).' }
+                        ]
+                    },
+                    {
+                        subtitle: 'අනුකලනය (Integration) – Part C',
+                        items: [
+                            { id: 'q15_i_c1', text: 'කොටස් වශයෙන් අනුකලනය (Integration by Parts).' },
+                            { id: 'q15_i_c2', text: 'පළමුව අවකලනය කර පසුව අනුකලනය කරන ප්‍රශ්න.' },
+                            { id: 'q15_i_c3', text: 'පන්ති සටහන බලන්න.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'q16',
+                title: 'ප්‍රශ්නය 16 – ඛණ්ඩාංක ජ්‍යාමිතිය',
+                enTitle: 'Question 16 – Coordinate Geometry',
+                items: [
+                    { id: 'q16_1', text: 'සරල රේඛාව සහ වෘත්තය පාඩම් හොඳින් නැවත ආවර්ජනය කරන්න.' },
+                    { id: 'q16_2', text: 'පසුගිය විභාග ප්‍රශ්න කර අවසන් කරන්න.' }
+                ]
+            },
+            {
+                id: 'q17',
+                title: 'ප්‍රශ්නය 17 – ත්‍රිකෝණමිතිය (Trigonometry)',
+                enTitle: 'Question 17 – Trigonometry',
+                subsections: [
+                    {
+                        subtitle: 'Part A',
+                        items: [
+                            { id: 'q17_a1', text: 'ත්‍රිකෝණමිතික සමීකරණ විසඳීම.' },
+                            { id: 'q17_a2', text: 'sin x, cos x සහ tan x හි සාධාරණ විසඳුම් නැවත බලන්න.' },
+                            { id: 'q17_a3', text: 'C ± D සූත්‍ර ප්‍රශ්න නැවත බලන්න.' }
+                        ]
+                    },
+                    {
+                        subtitle: 'Part B',
+                        items: [
+                            { id: 'q17_b1', text: 'සයින් නීතිය (Sine Rule).' },
+                            { id: 'q17_b2', text: 'කොසයින් නීතිය (Cosine Rule).' },
+                            { id: 'q17_b3', text: 'ප්‍රක්ෂේපණ නීතිය (Projection Rule).' },
+                            { id: 'q17_b4', text: 'ජ්‍යාමිතිය පදනම් කරගත් ත්‍රිකෝණමිතික ප්‍රශ්න.' }
+                        ]
+                    },
+                    {
+                        subtitle: 'Part C',
+                        items: [
+                            { id: 'q17_c1', text: 'ප්‍රතිලෝම ත්‍රිකෝණමිතික ශ්‍රිත (Inverse Trigonometric Functions).' },
+                            { id: 'q17_c2', text: 'පන්ති සටහන බලන්න.' },
+                            { id: 'q17_c3', text: 'පසුගිය විභාග ප්‍රශ්න කර අවසන් කරන්න.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'final_reminder',
+                title: 'අවසාන මතක් කිරීම් (Final Reminders) 📌',
+                enTitle: 'Final Reminder',
+                isSpecial: true,
+                items: [
+                    { id: 'fr_1', text: 'ඔබගේ තියරි සටහන් අවධානයෙන් නැවත ආවර්ජනය කරන්න.' },
+                    { id: 'fr_2', text: 'පන්තියේ සාකච්ඡා කළ වැදගත් පසුගිය විභාග ප්‍රශ්න කර අවසන් කරන්න.' },
+                    { id: 'fr_3', text: 'සියලුම අත්‍යවශ්‍ය සූත්‍ර සහ ප්‍රමේයයන් මතක තබා ගන්න.' },
+                    { id: 'fr_4', text: 'පිළිතුරු කටපාඩම් නොකර ක්‍රමවේදයන් නිවැරදිව තේරුම් ගන්න.' }
+                ]
+            }
+        ];
 
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const difference = targetDate - now;
+        // App state variables
+        let completedItems = new Set(JSON.parse(localStorage.getItem('pureMathsChecklist') || '[]'));
+        let currentFilter = 'all'; // 'all', 'pending', 'completed'
+        let collapsedCards = new Set();
+        let allExpanded = true;
 
-            // Calculate only days as per the design
-            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderChecklist();
+            updateProgress();
+            setupEventListeners();
+        });
 
-            const display = document.getElementById("days-count");
-            
-            if (days > 0) {
-                display.innerText = days;
+        // Theme Toggle Logic
+        function initTheme() {
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('themeIcon').className = 'fa-solid fa-sun text-yellow-400 text-lg';
             } else {
-                display.innerText = "0";
+                document.documentElement.classList.remove('dark');
+                document.getElementById('themeIcon').className = 'fa-solid fa-moon text-lg';
             }
         }
 
-        // Initial call
-        updateCountdown();
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                document.getElementById('themeIcon').className = 'fa-solid fa-moon text-lg';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                document.getElementById('themeIcon').className = 'fa-solid fa-sun text-yellow-400 text-lg';
+            }
+        }
 
-        // Update every hour is enough for a day-based counter
-        setInterval(updateCountdown, 3600000);
+        // Main Render Function
+        function renderChecklist() {
+            const container = document.getElementById('checklistContainer');
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+            container.innerHTML = '';
+
+            let totalVisibleSections = 0;
+
+            checklistData.forEach((section, index) => {
+                // Collect all items in section
+                let allSectionItems = [];
+                if (section.items) {
+                    allSectionItems.push(...section.items);
+                }
+                if (section.subsections) {
+                    section.subsections.forEach(sub => allSectionItems.push(...sub.items));
+                }
+
+                // Calculate completed for section
+                const sectionTotal = allSectionItems.length;
+                const sectionCompleted = allSectionItems.filter(item => completedItems.has(item.id)).length;
+                const sectionPercent = Math.round((sectionCompleted / sectionTotal) * 100) || 0;
+
+                // Filtering & Search check
+                const isCollapsed = collapsedCards.has(section.id);
+                
+                // Build section DOM element
+                const sectionCard = document.createElement('div');
+                sectionCard.className = `bg-white dark:bg-slate-800 rounded-2xl border ${
+                    section.isSpecial 
+                        ? 'border-amber-300 dark:border-amber-700/60 bg-amber-50/30 dark:bg-amber-950/20' 
+                        : 'border-slate-200 dark:border-slate-700/80'
+                } shadow-sm transition-all duration-200 overflow-hidden`;
+                sectionCard.dataset.sectionId = section.id;
+
+                // Section Header
+                const header = document.createElement('div');
+                header.className = 'p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none border-b border-slate-100 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition';
+                
+                header.innerHTML = `
+                    <div class="flex items-center space-x-3 flex-1 min-w-0 pr-3">
+                        <span class="w-8 h-8 rounded-lg ${section.isSpecial ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400'} flex items-center justify-center font-bold text-sm flex-shrink-0">
+                            ${section.isSpecial ? '📌' : (index + 1)}
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+                                ${section.title}
+                            </h3>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 truncate">${section.enTitle}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <div class="text-right">
+                            <span class="text-xs font-semibold ${sectionPercent === 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}">
+                                ${sectionCompleted}/${sectionTotal}
+                            </span>
+                            <div class="w-16 bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 mt-1 overflow-hidden">
+                                <div class="bg-brand-500 h-full rounded-full transition-all duration-300" style="width: ${sectionPercent}%"></div>
+                            </div>
+                        </div>
+                        <button class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+                            <i class="fa-solid fa-chevron-${isCollapsed ? 'down' : 'up'} text-sm"></i>
+                        </button>
+                    </div>
+                `;
+
+                header.addEventListener('click', () => {
+                    if (collapsedCards.has(section.id)) {
+                        collapsedCards.delete(section.id);
+                    } else {
+                        collapsedCards.add(section.id);
+                    }
+                    renderChecklist();
+                });
+
+                // Section Body / Content
+                const cardBody = document.createElement('div');
+                cardBody.className = `card-body p-4 sm:p-5 pt-3 space-y-3 ${isCollapsed ? 'hidden' : 'block'}`;
+
+                let hasVisibleItems = false;
+
+                // Render Direct Items
+                if (section.items) {
+                    const itemsContainer = document.createElement('div');
+                    itemsContainer.className = 'space-y-2';
+
+                    section.items.forEach(item => {
+                        const isDone = completedItems.has(item.id);
+                        const matchesFilter = (currentFilter === 'all') || 
+                                              (currentFilter === 'pending' && !isDone) || 
+                                              (currentFilter === 'completed' && isDone);
+                        
+                        const matchesSearch = !searchQuery || 
+                                              item.text.toLowerCase().includes(searchQuery) || 
+                                              section.title.toLowerCase().includes(searchQuery);
+
+                        if (matchesFilter && matchesSearch) {
+                            hasVisibleItems = true;
+                            itemsContainer.appendChild(createItemRow(item, isDone));
+                        }
+                    });
+
+                    cardBody.appendChild(itemsContainer);
+                }
+
+                // Render Subsections
+                if (section.subsections) {
+                    section.subsections.forEach(sub => {
+                        let subHasItems = false;
+                        const subContainer = document.createElement('div');
+                        subContainer.className = 'mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/50 space-y-2';
+
+                        const subTitle = document.createElement('h4');
+                        subTitle.className = 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1.5';
+                        subTitle.innerHTML = `<i class="fa-solid fa-layer-group text-[10px] text-brand-500"></i> ${sub.subtitle}`;
+                        subContainer.appendChild(subTitle);
+
+                        sub.items.forEach(item => {
+                            const isDone = completedItems.has(item.id);
+                            const matchesFilter = (currentFilter === 'all') || 
+                                                  (currentFilter === 'pending' && !isDone) || 
+                                                  (currentFilter === 'completed' && isDone);
+
+                            const matchesSearch = !searchQuery || 
+                                                  item.text.toLowerCase().includes(searchQuery) || 
+                                                  sub.subtitle.toLowerCase().includes(searchQuery) ||
+                                                  section.title.toLowerCase().includes(searchQuery);
+
+                            if (matchesFilter && matchesSearch) {
+                                subHasItems = true;
+                                hasVisibleItems = true;
+                                subContainer.appendChild(createItemRow(item, isDone));
+                            }
+                        });
+
+                        if (subHasItems) {
+                            cardBody.appendChild(subContainer);
+                        }
+                    });
+                }
+
+                // Append card if items are visible
+                if (hasVisibleItems || (!searchQuery && currentFilter === 'all')) {
+                    sectionCard.appendChild(header);
+                    sectionCard.appendChild(cardBody);
+                    container.appendChild(sectionCard);
+                    totalVisibleSections++;
+                }
+            });
+
+            // Empty search state
+            if (totalVisibleSections === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <i class="fa-solid fa-magnifying-glass text-4xl text-slate-300 dark:text-slate-600 mb-3"></i>
+                        <p class="text-slate-600 dark:text-slate-300 font-medium text-base">කිසිදු ප්‍රශ්නයක් හෝ කරුණක් සොයාගත නොහැකි විය</p>
+                        <p class="text-xs text-slate-400 mt-1">කරුණාකර වෙනත් සෙවුම් පදයක් භාවිතා කරන්න හෝ Filter වෙනස් කරන්න.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Helper to Create Item DOM Row
+        function createItemRow(item, isDone) {
+            const row = document.createElement('label');
+            row.className = `flex items-start space-x-3 p-2.5 rounded-xl transition cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-700/40 select-none ${
+                isDone ? 'bg-slate-50/50 dark:bg-slate-800/40' : ''
+            }`;
+
+            row.innerHTML = `
+                <input type="checkbox" data-id="${item.id}" class="checkbox-custom mt-0.5" ${isDone ? 'checked' : ''}>
+                <span class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium flex-1 ${
+                    isDone ? 'completed-item text-slate-400 dark:text-slate-500' : ''
+                }">
+                    ${item.text}
+                </span>
+            `;
+
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            checkbox.addEventListener('change', (e) => {
+                const id = e.target.dataset.id;
+                if (e.target.checked) {
+                    completedItems.add(id);
+                } else {
+                    completedItems.delete(id);
+                }
+                saveProgress();
+                updateProgress();
+                renderChecklist();
+            });
+
+            return row;
+        }
+
+        // Save to Local Storage
+        function saveProgress() {
+            localStorage.setItem('pureMathsChecklist', JSON.stringify(Array.from(completedItems)));
+        }
+
+        // Calculate and Update Total Progress
+        function updateProgress() {
+            let total = 0;
+            checklistData.forEach(sec => {
+                if (sec.items) total += sec.items.length;
+                if (sec.subsections) {
+                    sec.subsections.forEach(sub => total += sub.items.length);
+                }
+            });
+
+            const completed = completedItems.size;
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('overallPercent').innerHTML = `${percent}<span class="text-xl">%</span>`;
+            document.getElementById('overallStats').textContent = `${completed} / ${total} අයිතම`;
+            document.getElementById('mainProgressBar').style.width = `${percent}%`;
+
+            // Celebration Modal when 100% completed
+            if (percent === 100 && total > 0) {
+                setTimeout(() => {
+                    openModal('completionModal');
+                }, 300);
+            }
+        }
+
+        // Event Listeners Setup
+        function setupEventListeners() {
+            // Theme Toggle
+            document.getElementById('btnThemeToggle').addEventListener('click', toggleTheme);
+
+            // Print Action
+            document.getElementById('btnPrint').addEventListener('click', () => {
+                window.print();
+            });
+
+            // Filter Buttons
+            const filterBtns = {
+                'filterAll': 'all',
+                'filterPending': 'pending',
+                'filterCompleted': 'completed'
+            };
+
+            Object.keys(filterBtns).forEach(btnId => {
+                document.getElementById(btnId).addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.className = 'filter-btn px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 transition';
+                    });
+                    e.target.className = 'filter-btn px-3 py-1.5 rounded-lg bg-brand-600 text-white font-semibold transition';
+                    currentFilter = filterBtns[btnId];
+                    renderChecklist();
+                });
+            });
+
+            // Search Filter
+            document.getElementById('searchInput').addEventListener('input', () => {
+                renderChecklist();
+            });
+
+            // Expand / Collapse All
+            document.getElementById('btnToggleExpand').addEventListener('click', () => {
+                if (allExpanded) {
+                    checklistData.forEach(s => collapsedCards.add(s.id));
+                    document.getElementById('expandText').textContent = 'සියල්ල දිගහරින්න';
+                } else {
+                    collapsedCards.clear();
+                    document.getElementById('expandText').textContent = 'සියල්ල හකුළන්න';
+                }
+                allExpanded = !allExpanded;
+                renderChecklist();
+            });
+
+            // Reset Modal Trigger
+            document.getElementById('btnReset').addEventListener('click', () => {
+                openModal('resetModal');
+            });
+
+            document.getElementById('btnCancelReset').addEventListener('click', () => {
+                closeModal('resetModal');
+            });
+
+            document.getElementById('btnConfirmReset').addEventListener('click', () => {
+                completedItems.clear();
+                saveProgress();
+                updateProgress();
+                renderChecklist();
+                closeModal('resetModal');
+            });
+
+            document.getElementById('btnCloseModal').addEventListener('click', () => {
+                closeModal('completionModal');
+            });
+        }
+
+        // Modal Helpers
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-95');
+            modal.querySelector('div').classList.add('scale-100');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-100');
+            modal.querySelector('div').classList.add('scale-95');
+        }
     </script>
 </body>
 </html>
