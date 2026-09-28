@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Space❤️❤️</title>
+    <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #0a060c;
+            --bg-card: rgba(25, 15, 30, 0.85);
+            --border-card: rgba(236, 72, 153, 0.25);
+            --border-card-hover: rgba(236, 72, 153, 0.5);
+            --text-main: #fce7f3;
+            --text-muted: #f472b6;
+            --accent-pink: #ec4899;
+            --accent-rose: #f43f5e;
+            --accent-glow: rgba(236, 72, 153, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 15px;
+        }
+
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(244,114,182,0.8) 0%, rgba(236,72,153,0) 70%);
+            border-radius: 50%;
+            animation: floatUp 12s infinite linear;
+            opacity: 0.3;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        .global-floating-subtitle {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            width: 90%;
+            max-width: 600px;
+            background: rgba(15, 8, 22, 0.9);
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 50px;
+            padding: 8px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 20px rgba(236,72,153,0.3);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .global-floating-subtitle .music-badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-pink);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .global-floating-subtitle .floating-sub-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.95rem;
+            color: #fff;
+            font-style: italic;
+            text-align: center;
+            text-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .music-toggle {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 2001;
+            background: rgba(30, 15, 40, 0.85);
+            border: 1px solid var(--border-card);
+            backdrop-filter: blur(10px);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+        }
+
+        .music-toggle:hover {
+            border-color: var(--accent-pink);
+            transform: scale(1.05);
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 680px;
+            margin-top: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stage {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .stage.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 35px 28px;
+            width: 100%;
+            box-shadow: 0 14px 50px rgba(0,0,0,0.65), 0 0 40px var(--accent-glow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: -0.5px;
+        }
+
+        .title-main {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff 30%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #d1d5db;
+            font-size: 1rem;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .author-tag {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: -6px;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            position: relative;
+            width: 100%;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: rgba(15, 10, 20, 0.7);
+            border: 1px solid rgba(236, 72, 153, 0.35);
+            border-radius: 14px;
+            padding: 16px 20px;
+            color: #fff;
+            font-size: 1.05rem;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-pink);
+            box-shadow: 0 0 18px rgba(236, 72, 153, 0.4);
+        }
+
+        .btn-romantic {
+            background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+            color: #fff;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
+            transition: all 0.3s ease;
+            width: 100%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-romantic:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(236, 72, 153, 0.6);
+        }
+
+        .btn-romantic:active {
+            transform: translateY(0);
+        }
+
+        .error-msg {
+            color: #fb7185;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            min-height: 20px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-msg.show {
+            opacity: 1;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .countdown-hero {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(15, 8, 22, 0.7) 100%);
+            border: 1px solid rgba(236, 72, 153, 0.35);
+            border-radius: 22px;
+            padding: 24px 18px;
+            margin-bottom: 22px;
+            text-align: center;
+            box-shadow: 0 10px 35px rgba(236, 72, 153, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-hero h2 {
+            font-size: 1.35rem;
+            color: #fff;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .countdown-hero .target-date {
+            font-size: 0.92rem;
+            color: var(--accent-pink);
+            margin-bottom: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .marriage-timer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        @media(max-width: 500px) {
+            .marriage-timer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .timer-box {
+            background: rgba(15, 8, 22, 0.75);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            border-radius: 14px;
+            padding: 12px 8px;
+            text-align: center;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .timer-number {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 2px;
+            text-shadow: 0 0 10px rgba(236,72,153,0.4);
+        }
+
+        .timer-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .months-breakdown-card {
+            background: rgba(20, 10, 28, 0.75);
+            border: 1px solid rgba(236, 72, 153, 0.35);
+            border-radius: 18px;
+            padding: 18px 20px;
+            margin-bottom: 22px;
+            text-align: left;
+            box-shadow: inset 0 2px 12px rgba(0,0,0,0.4);
+        }
+
+        .breakdown-title {
+            font-size: 1rem;
+            font-family: 'Playfair Display', serif;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breakdown-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.92rem;
+            color: #d1d5db;
+        }
+
+        .breakdown-stats span {
+            color: var(--accent-pink);
+            font-weight: 700;
+        }
+
+        .memory-box-container {
+            background: rgba(20, 10, 28, 0.75);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            border-radius: 22px;
+            padding: 20px;
+            margin-bottom: 22px;
+            text-align: left;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+
+        .memory-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .memory-box-title {
+            font-size: 1.1rem;
+            font-family: 'Playfair Display', serif;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .memory-box-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        .memory-hearts-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .memory-heart-btn {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(244, 63, 94, 0.25) 100%);
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            border-radius: 50px;
+            padding: 8px 14px;
+            color: #fff;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.15);
+        }
+
+        .memory-heart-btn:hover {
+            background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+            border-color: #fff;
+        }
+
+        .memory-heart-btn.active {
+            background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.6);
+        }
+
+        .memory-display-card {
+            background: rgba(15, 8, 22, 0.85);
+            border: 1px dashed rgba(236, 72, 153, 0.4);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            min-height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            color: #fce7f3;
+            font-style: italic;
+            line-height: 1.4;
+            transition: opacity 0.3s ease;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 22px;
+            width: 100%;
+        }
+
+        @media(min-width: 580px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .time-card {
+            background: rgba(20, 10, 25, 0.6);
+            border: 1px solid rgba(236, 72, 153, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .time-card:hover {
+            border-color: rgba(236, 72, 153, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.2);
+        }
+
+        .time-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .time-values {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .time-values span {
+            color: var(--accent-pink);
+        }
+
+        .progress-container {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 22px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ec4899, #f43f5e);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 10px;
+        }
+
+        .question-title {
+            font-size: 1.4rem;
+            margin-bottom: 22px;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 18px;
+        }
+
+        .game-card {
+            background: rgba(25, 15, 35, 0.75);
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            padding: 16px 20px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .game-card:hover {
+            border-color: var(--accent-pink);
+            background: rgba(40, 20, 50, 0.85);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.25);
+        }
+
+        .game-card.selected {
+            border-color: var(--accent-pink);
+            background: linear-gradient(135deg, rgba(236,72,153,0.3) 0%, rgba(244,63,94,0.25) 100%);
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.45);
+        }
+
+        .ranking-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .rank-item {
+            background: rgba(25, 15, 35, 0.85);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .rank-item:active { cursor: grabbing; }
+
+        .rank-number {
+            background: rgba(236, 72, 153, 0.25);
+            color: var(--accent-pink);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.88rem;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .rank-controls { display: flex; gap: 6px; }
+
+        .rank-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .rank-btn:hover { background: var(--accent-pink); }
+
+        .results-scroll {
+            max-height: 340px;
+            overflow-y: auto;
+            width: 100%;
+            padding-right: 5px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .results-scroll::-webkit-scrollbar { width: 5px; }
+        .results-scroll::-webkit-scrollbar-thumb {
+            background: rgba(236, 72, 153, 0.4);
+            border-radius: 10px;
+        }
+
+        .result-item {
+            background: rgba(20, 10, 25, 0.6);
+            border: 1px solid rgba(236, 72, 153, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+        }
+
+        .result-category {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .result-answer {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .final-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+        }
+
+        .final-line-1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.7rem;
+            color: #fff;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 1s ease;
+        }
+
+        .final-line-2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.1rem;
+            background: linear-gradient(135deg, #fff 20%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 1s ease 0.5s;
+        }
+
+        .final-quote {
+            font-size: 0.98rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 4px;
+            opacity: 0;
+            transition: all 1s ease 0.8s;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .final-signature {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 8px;
+            opacity: 0;
+            transition: all 1s ease 1.1s;
+        }
+
+        .visible {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        .floating-heart {
+            position: fixed;
+            pointer-events: none;
+            color: var(--accent-pink);
+            font-size: 20px;
+            animation: floatHeart 1s ease-out forwards;
+            z-index: 9999;
+        }
+
+        @keyframes floatHeart {
+            0% { transform: translate(0, 0) scale(0.8); opacity: 1; }
+            100% { transform: translate(var(--rand-x), -80px) scale(1.4); opacity: 0; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background particles layer -->
+    <div id="bgParticles" class="bg-particles"></div>
+
+    <!-- Floating Top Subtitle Banner -->
+    <div id="globalSubtitle" class="global-floating-subtitle" style="display: none;">
+        <span class="music-badge">🎵 High on Life</span>
+        <span id="floatingSubText" class="floating-sub-text">🎵 High on Life - Martin Garrix 🎵</span>
+    </div>
+
+    <!-- Music Floating Toggle Button -->
+    <button id="musicToggle" class="music-toggle">
+        <span id="musicIcon">🔊</span>
+        <span id="musicText">Play Music</span>
+    </button>
+
+    <!-- Main Content Container -->
+    <div class="container">
+
+        <!-- STAGE 0: LOCKED GATE (Active until 2026-09-29 00:00) -->
+        <div id="stage0" class="stage">
+            <div class="glass-card">
+                <h1 class="title-main">Our Little Space ❤️</h1>
+                <p class="author-tag">Created with all my heart by Your Love Sanuka</p>
+                <p class="subtitle">This magical little space is currently locked until September 29, 2026, at 00:00.</p>
+
+                <div class="countdown-hero">
+                    <h2>✨ Countdown to Open "Our Little Space" ✨</h2>
+                    <div class="target-date">September 29, 2026 • 00:00 AM</div>
+                    <div id="lockTimerGrid" class="marriage-timer-grid">
+                        <div class="timer-box">
+                            <div id="lockDays" class="timer-number">0</div>
+                            <div class="timer-label">Days</div>
+                        </div>
+                        <div class="timer-box">
+                            <div id="lockHours" class="timer-number">0</div>
+                            <div class="timer-label">Hours</div>
+                        </div>
+                        <div class="timer-box">
+                            <div id="lockMins" class="timer-number">0</div>
+                            <div class="timer-label">Minutes</div>
+                        </div>
+                        <div class="timer-box">
+                            <div id="lockSecs" class="timer-number">0</div>
+                            <div class="timer-label">Seconds</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="font-size: 0.9rem; color: #f472b6; font-style: italic;">
+                    Hang tight, Pabasara! Something wonderfully special is waiting for you. 💌 — Your Love Sanuka
+                </p>
+            </div>
+        </div>
+
+        <!-- STAGE 1: PASSWORD GATE -->
+        <div id="stage1" class="stage">
+            <div class="glass-card">
+                <h1 class="title-main">My Baby Girl Pabasara ❤️❤️</h1>
+                <p class="author-tag">Crafted lovingly by Your Love Sanuka</p>
+                
+                <div class="input-group">
+                    <input type="text" id="passwordInput" placeholder="Enter password..." autocomplete="off">
+                    <div id="errorMsg" class="error-msg">That's not it, Pabasara 😭❤️</div>
+                </div>
+
+                <button id="passwordBtn" class="btn-romantic">
+                    Enter ❤️❤️
+                </button>
+
+                <p style="margin-top: 25px; font-size: 0.85rem; color: #9ca3af; line-height: 1.4;">
+                    Hint: The sentence we used to say when one of us goes to sleep and the other one wakes up.
+                </p>
+            </div>
+        </div>
+
+        <!-- STAGE 2: TIMELINE & WEDDING COUNTDOWN -->
+        <div id="stage2" class="stage">
+            <div class="glass-card">
+                <h1 class="title-main">Our Little Timeline✨</h1>
+                <p class="subtitle">Counting every moment until our Dream.</p>
+
+                <!-- Wedding Countdown Hero Box -->
+                <div class="countdown-hero">
+                    <h2>💒 Countdown to Our Wedding Day</h2>
+                    <div id="marriageTimerGrid" class="marriage-timer-grid">
+                        <div class="timer-box">
+                            <div id="cdMonths" class="timer-number">0</div>
+                            <div class="timer-label">Months</div>
+                        </div>
+                        <div class="timer-box">
+                            <div id="cdDays" class="timer-number">0</div>
+                            <div class="timer-label">Days</div>
+                        </div>
+                        <div class="timer-box">
+                            <div id="cdHours" class="timer-number">0</div>
+                            <div class="timer-label">Hours</div>
+                        </div>
+                        <div class="timer-box">
+                            <div id="cdMins" class="timer-number">0</div>
+                            <div class="timer-label">Minutes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full Breakdown Stats Box -->
+                <div class="months-breakdown-card">
+                    <div class="breakdown-title">⏳ Detailed Time Breakdown</div>
+                    <div class="breakdown-stats">
+                        <div>• Months until wedding: <span id="statTotalMonths">0</span> months</div>
+                        <div>• Minutes until wedding: <span id="statMonthMins">0</span> minutes</div>
+                        <div>• Hours until wedding: <span id="statFullHours">0</span> hours</div>
+                    </div>
+                </div>
+
+                <!-- Interactive Memory Box with Hearts -->
+                <div class="memory-box-container">
+                    <div class="memory-box-header">
+                        <div class="memory-box-title">
+                            <span>🎁</span> Memory Box
+                        </div>
+                    </div>
+                    <div class="memory-box-subtitle">Click each heart below to unlock hidden secrets and memories of us:</div>
+                    
+                    <div class="memory-hearts-grid">
+                        <button class="memory-heart-btn" onclick="revealMemory(0, this)">❤️ First Talk</button>
+                        <button class="memory-heart-btn" onclick="revealMemory(1, this)">💖 Falling in Love</button>
+                        <button class="memory-heart-btn" onclick="revealMemory(2, this)">✨ Late Night Chats</button>
+                        <button class="memory-heart-btn" onclick="revealMemory(3, this)">✨ First Trip</button>
+                        <button class="memory-heart-btn" onclick="revealMemory(4, this)">😘 First Kiss on hand</button>
+                        <button class="memory-heart-btn" onclick="revealMemory(5, this)">😊 Future</button>
+                    </div>
+
+                    <div id="memoryDisplayCard" class="memory-display-card">
+                        "Tap any heart above to reveal a sweet secret memory waiting just for you, my Baby Girl... 💌"
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="time-card">
+                        <h3>Since we first talked 💬</h3>
+                        <div id="counterTalk" class="time-values">Calculating...</div>
+                    </div>
+                    <div class="time-card">
+                        <h3>Since we fell in love ❤️</h3>
+                        <div id="counterLove" class="time-values">Calculating...</div>
+                    </div>
+                    <div class="time-card">
+                        <h3>Since I first texted you 📱</h3>
+                        <div id="counterText" class="time-values">Calculating...</div>
+                    </div>
+                    <div class="time-card">
+                        <h3>Since I last saw you 🥺</h3>
+                        <div id="counterLastSeen" class="time-values">Calculating...</div>
+                    </div>
+                </div>
+
+                <button id="startGameBtn" class="btn-romantic">
+                    Let's play something ❤️❤️
+                </button>
+            </div>
+        </div>
+
+        <!-- STAGE 3: QUIZ / GAME -->
+        <div id="stage3" class="stage">
+            <div class="glass-card" style="text-align: left;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span id="questionCounter" style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">Question 1 of 12</span>
+                    <span style="font-size: 0.85rem; color: var(--accent-pink);">Baby Girl's Choices ❤️❤️</span>
+                </div>
+                <div class="progress-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+
+                <h2 id="questionTitle" class="question-title">Loading question...</h2>
+
+                <div id="optionsContainer" class="options-grid"></div>
+                <div id="rankingContainer" class="ranking-container" style="display: none;"></div>
+
+                <button id="nextQuestionBtn" class="btn-romantic" style="display: none; margin-top: 10px;">
+                    That's my order ❤️❤️
+                </button>
+            </div>
+        </div>
+
+        <!-- STAGE 4: RESULTS SUMMARY -->
+        <div id="stage4" class="stage">
+            <div class="glass-card">
+                <h1 class="title-main">Your choices, Pabasara ❤️❤️</h1>
+                <p class="subtitle">Here is a little summary of what your heart picked.</p>
+
+                <div id="resultsSummary" class="results-scroll"></div>
+
+                <button id="viewFinalBtn" class="btn-romantic">
+                    Continue ❤️❤️
+                </button>
+            </div>
+        </div>
+
+        <!-- STAGE 5: FINAL LOVE NOTE -->
+        <div id="stage5" class="stage">
+            <div class="glass-card" style="padding: 40px 25px;">
+                <div class="final-box">
+                    <div id="finalLine1" class="final-line-1">I can't lose you now</div>
+                    <div id="finalLine2" class="final-line-2">It is you I have chosen. ❤️❤️</div>
+                    <div id="finalQuote" class="final-quote">"High on Life by Martin Garrix"</div>
+                    <div id="finalSignature" class="final-signature">My Love, Pabasara ❤️❤️ — Your Love Sanuka</div>
+
+                    <div style="width: 100%; margin-top: 20px;">
+                        <button id="whatsappBtn" class="btn-romantic">
+                            Send my choices to your Fiance☺️☺️ on WhatsApp 💌
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Audio Element -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="love.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const CONFIG = {
+            girlfriendName: "Pabasara",
+            password: "Good Morning❤️❤️",
+            lockDate: "2026-09-29T00:00:00",
+            marriageDate: "2034-08-26T00:00:00",
+            firstTalkDate: "2026-03-07T15:50:00",
+            fellInLoveDate: "2026-08-26T23:45:00",
+            firstTextDate: "2026-05-12T03:15:00",
+            lastSeenDate: "2026-09-24T12:00:00"
+        };
+
+        // Subtitles for High on Life
+        const lyrics = [
+            { time: 0, text: "🎵 High on Life - Martin Garrix 🎵" },
+            { time: 7, text: "Killed the demons of my mind, ever since you came around. ✨" },
+            { time: 15, text: "We're a river running wild. How could I have been so blind? 🌊" },
+            { time: 22, text: "I just live a fast life. Forget about the past time. I numb out to escape my feels. 💭" },
+            { time: 29, text: "And friendships only pass by. Show up, gone, like strobe lights. But with you, I feel something real. ❤️" },
+            { time: 37, text: "And I’d walk a million miles, just to see you smile ’Til the day I die. 👣" },
+            { time: 45, text: "Oh, I need you by my side. We get high on life ’Til the day we die. 🌟" },
+            { time: 56, text: "High on life ’Til the day we die... 💫" },
+            { time: 78, text: "High on life ’Til the day we die. 💖" },
+            { time: 89, text: "And I’d walk a million miles, just to see you smile ’Til the day I die. 😊" },
+            { time: 108, text: "High on life ’Til the day we die. Through my fingers, out of sight. 🌾" },
+            { time: 120, text: "How could I have let you go? Cutting corners, turning stones. But I can only see your ghost. 👻" },
+            { time: 130, text: "I just live a fast life. Forget about the past time. I numb out to escape my feels. 🌙" },
+            { time: 138, text: "And friendships only pass by. Show up, gone, like strobe lights. ⚡" },
+            { time: 142, text: "But with you, I feel something real. And I’d walk a million miles, just to see you smile ’Til the day I die. 💞" },
+            { time: 153, text: "Oh I need you by my side. We get high on life ’Til the day we die. ✨" },
+            { time: 172, text: "High on life 'Til the day we die. 🌸" },
+            { time: 183, text: "Oh I need you by my side. We get high on life ’Til the day we die. 💒" },
+            { time: 202, text: "High on life 'Til the day we die. 🕊️" },
+            { time: 206, text: "And I’d walk a million miles, just to see you smile 'Til the day I die. 🥰" },
+            { time: 213, text: "Oh I need you by my side. We get high on life ’Til the day we die. ❤️♾️" }
+        ];
+
+        const hiddenMemories = [
+            "💬 March 7th: That one sentence changed our whole lives",
+            "💖 August 26th: Mt kiynn oni mn atthtm oyt yaluwekut wda kemthi❤️❤️masa gnk thisse oyt kiynn hitiye eth.oyata pressure ekk denn oni nthi nis thm mechchr kal hitiye❤️❤️",
+            "✨ Remember those late-night talks when neither of us wanted to say goodbye?",
+            "✨ Remember how we hold hands in the bus while enjoying ice cream with our love in Pabahinna❤️❤️",
+            "😘 That kiss i gave to you with all of my love❤️❤️",
+            "😊 Trillions of dreams about to come true...❤️❤️"
+        ];
+
+        function revealMemory(index, btnElement) {
+            document.querySelectorAll('.memory-heart-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            const card = document.getElementById('memoryDisplayCard');
+            card.style.opacity = '0';
+            setTimeout(() => {
+                card.textContent = hiddenMemories[index];
+                card.style.opacity = '1';
+            }, 200);
+        }
+
+        let currentStage = 1;
+        let currentQuestionIndex = 0;
+        const userAnswers = {};
+        let nicknameRankingList = [
+            "Sudu ❤️",
+            "Baby Girl 💗",
+            "Raththran 💎",
+            "Baba 🥺",
+            "Patiyo 😘",
+            "Wasthu 🤭"
+        ];
+
+        const questions = [
+            { id: "q1", type: "choice", title: "Which one would you rather have with me?", options: ["Talk for hours 💬", "Message for hours 💌"] },
+            { id: "q2", type: "choice", title: "And then...", options: ["Call for hours 📞", "Talk until we forget the time ⏰"] },
+            { id: "q3", type: "ranking", title: "Now something important 🤭<br><span style='font-size:0.95rem; color:#f472b6; font-weight:400;'>Put these in the order you like me calling you.</span>" },
+            { id: "q4", type: "choice", title: "How would you rather spend time with me?", options: ["Walk with me 🚶‍♀️❤️", "Sit with me 🫶"] },
+            { id: "q5", type: "choice", title: "What would you choose?", options: ["Kiss 😘", "A hug 🤗"] },
+            { id: "q6", type: "choice", title: "If I gave you one...", options: ["Kiss on the lips 💋", "Kiss on the forehead 🥰"] },
+            { id: "q7", type: "choice", title: "Okay... now this one 🤭", options: ["Kiss on the cheeks 😚", "A really long hug 🤗❤️"] },
+            { id: "q8", type: "choice", title: "Our little date?", options: ["Ice cream 🍦", "A coffee ☕"] },
+            { id: "q9", type: "choice", title: "Which sounds better?", options: ["Walking with me 🚶‍♂️❤️", "Going with me on a bus 🚌"] },
+            { id: "q10", type: "choice", title: "How should we spend the midnight?", options: ["Midnight calls 🌙📞", "Midnight texting 🌙💬"] },
+            { id: "q11", type: "choice", title: "Our first proper date?", options: ["First date ❤️", "Coffee date ☕"] },
+            { id: "q12", type: "choice", title: "Where would you rather go with me?", options: ["Coffee date ☕❤️", "Visit some place with me 🎓"] }
+        ];
+
+        function initParticles() {
+            const container = document.getElementById('bgParticles');
+            if (!container) return;
+            container.innerHTML = '';
+            const count = 25;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 6 + 2;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}vw`;
+                p.style.animationDuration = `${Math.random() * 10 + 8}s`;
+                p.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(p);
+            }
+        }
+
+        const bgMusic = document.getElementById('bgMusic');
+        const musicToggle = document.getElementById('musicToggle');
+        const musicIcon = document.getElementById('musicIcon');
+        const musicText = document.getElementById('musicText');
+        const globalSubtitle = document.getElementById('globalSubtitle');
+        const floatingSubText = document.getElementById('floatingSubText');
+        let isMusicPlaying = false;
+
+        if (musicToggle && bgMusic) {
+            musicToggle.addEventListener('click', () => {
+                if (isMusicPlaying) {
+                    bgMusic.pause();
+                    isMusicPlaying = false;
+                    musicIcon.textContent = "🔇";
+                    musicText.textContent = "Muted";
+                } else {
+                    bgMusic.play().then(() => {
+                        isMusicPlaying = true;
+                        musicIcon.textContent = "🔊";
+                        musicText.textContent = "Playing";
+                        if (globalSubtitle) globalSubtitle.style.display = "flex";
+                    }).catch(e => {
+                        console.log("Audio play failed:", e);
+                    });
+                }
+            });
+        }
+
+        function tryPlayMusic() {
+            if (!bgMusic) return;
+            bgMusic.volume = 0.6;
+            bgMusic.play().then(() => {
+                isMusicPlaying = true;
+                if (musicIcon) musicIcon.textContent = "🔊";
+                if (musicText) musicText.textContent = "Playing";
+                if (globalSubtitle) globalSubtitle.style.display = "flex";
+            }).catch(e => {
+                console.log("Autoplay blocked or audio missing:", e);
+                if (musicIcon) musicIcon.textContent = "🔊";
+                if (musicText) musicText.textContent = "Play Music";
+            });
+        }
+
+        if (bgMusic) {
+            bgMusic.addEventListener('timeupdate', () => {
+                const currentTime = bgMusic.currentTime;
+                let currentLyric = lyrics[0].text;
+                for (let i = 0; i < lyrics.length; i++) {
+                    if (currentTime >= lyrics[i].time) {
+                        currentLyric = lyrics[i].text;
+                    } else {
+                        break;
+                    }
+                }
+                if (floatingSubText) floatingSubText.textContent = currentLyric;
+                if (isMusicPlaying && globalSubtitle && globalSubtitle.style.display === 'none') {
+                    globalSubtitle.style.display = 'flex';
+                }
+            });
+        }
+
+        function transitionToStage(stageNum) {
+            document.querySelectorAll('.stage').forEach(el => el.classList.remove('active'));
+            const targetStage = document.getElementById(`stage${stageNum}`);
+            if (targetStage) {
+                targetStage.classList.add('active');
+                currentStage = stageNum;
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function checkLockDate() {
+            const now = new Date();
+            const lockTime = new Date(CONFIG.lockDate);
+            if (now < lockTime) {
+                transitionToStage(0);
+                return true;
+            }
+            return false;
+        }
+
+        function updateLockCountdown() {
+            const now = new Date();
+            const target = new Date(CONFIG.lockDate);
+            let diffMs = target - now;
+            
+            if (diffMs <= 0) {
+                diffMs = 0;
+                if (currentStage === 0) {
+                    transitionToStage(1);
+                }
+            }
+
+            const totalSec = Math.floor(diffMs / 1000);
+            const days = Math.floor(totalSec / (3600 * 24));
+            const hours = Math.floor((totalSec % (3600 * 24)) / 3600);
+            const mins = Math.floor((totalSec % 3600) / 60);
+            const secs = totalSec % 60;
+
+            const lDays = document.getElementById('lockDays');
+            const lHours = document.getElementById('lockHours');
+            const lMins = document.getElementById('lockMins');
+            const lSecs = document.getElementById('lockSecs');
+
+            if (lDays) lDays.textContent = days;
+            if (lHours) lHours.textContent = hours;
+            if (lMins) lMins.textContent = mins;
+            if (lSecs) lSecs.textContent = secs;
+        }
+
+        function updateMarriageCountdown(targetDateStr) {
+            const now = new Date();
+            const target = new Date(targetDateStr);
+            let diffMs = target - now;
+            if (diffMs < 0) diffMs = 0;
+
+            const totalSec = Math.floor(diffMs / 1000);
+            const totalMin = Math.floor(totalSec / 60);
+            const totalHours = Math.floor(totalMin / 60);
+            const totalDays = Math.floor(totalHours / 24);
+
+            let months = (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth());
+            if (target.getDate() < now.getDate()) {
+                months--;
+            }
+            if (months < 0) months = 0;
+
+            const hours = totalHours % 24;
+            const mins = totalMin % 60;
+
+            const cdM = document.getElementById('cdMonths');
+            const cdD = document.getElementById('cdDays');
+            const cdH = document.getElementById('cdHours');
+            const cdMin = document.getElementById('cdMins');
+
+            if (cdM) cdM.textContent = months;
+            if (cdD) cdD.textContent = totalDays.toLocaleString();
+            if (cdH) cdH.textContent = hours;
+            if (cdMin) cdMin.textContent = mins;
+
+            const statM = document.getElementById('statTotalMonths');
+            const statMins = document.getElementById('statMonthMins');
+            const statH = document.getElementById('statFullHours');
+
+            if (statM) statM.textContent = months;
+            if (statMins) statMins.textContent = totalMin.toLocaleString();
+            if (statH) statH.textContent = totalHours.toLocaleString();
+        }
+
+        function formatElapsedTime(dateString) {
+            const startDate = new Date(dateString);
+            const now = new Date();
+            let diff = Math.floor((now - startDate) / 1000);
+            if (diff < 0) diff = 0;
+
+            const days = Math.floor(diff / (3600 * 24));
+            diff %= 3600 * 24;
+            const hours = Math.floor(diff / 3600);
+            diff %= 3600;
+            const minutes = Math.floor(diff / 60);
+            const seconds = diff % 60;
+
+            return `<span>${days}</span> days<br><span>${hours}</span>h <span>${minutes}</span>m <span>${seconds}</span>s`;
+        }
+
+        function updateCounters() {
+            updateLockCountdown();
+            updateMarriageCountdown(CONFIG.marriageDate);
+            
+            const elTalk = document.getElementById('counterTalk');
+            const elLove = document.getElementById('counterLove');
+            const elText = document.getElementById('counterText');
+            const elLast = document.getElementById('counterLastSeen');
+
+            if (elTalk) elTalk.innerHTML = formatElapsedTime(CONFIG.firstTalkDate);
+            if (elLove) elLove.innerHTML = formatElapsedTime(CONFIG.fellInLoveDate);
+            if (elText) elText.innerHTML = formatElapsedTime(CONFIG.firstTextDate);
+            if (elLast) elLast.innerHTML = formatElapsedTime(CONFIG.lastSeenDate);
+        }
+
+        setInterval(updateCounters, 1000);
+
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordBtn = document.getElementById('passwordBtn');
+        const errorMsg = document.getElementById('errorMsg');
+
+        function verifyPassword() {
+            if (!passwordInput) return;
+            const entered = passwordInput.value.trim();
+            // Case-insensitive or space tolerant matching
+            if (entered.toLowerCase() === CONFIG.password.toLowerCase() || entered === "Good Morning") {
+                tryPlayMusic();
+                transitionToStage(2);
+                updateCounters();
+            } else {
+                if (errorMsg) errorMsg.classList.add('show');
+                passwordInput.classList.add('shake');
+                setTimeout(() => {
+                    passwordInput.classList.remove('shake');
+                }, 400);
+            }
+        }
+
+        if (passwordBtn) passwordBtn.addEventListener('click', verifyPassword);
+        if (passwordInput) {
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') verifyPassword();
+            });
+        }
+
+        const startGameBtn = document.getElementById('startGameBtn');
+        if (startGameBtn) {
+            startGameBtn.addEventListener('click', () => {
+                transitionToStage(3);
+                loadQuestion();
+            });
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestionIndex];
+            const qCounter = document.getElementById('questionCounter');
+            const pBar = document.getElementById('progressBar');
+            const qTitle = document.getElementById('questionTitle');
+
+            if (qCounter) qCounter.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            if (pBar) pBar.style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
+            if (qTitle) qTitle.innerHTML = q.title;
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            const rankingContainer = document.getElementById('rankingContainer');
+            const nextBtn = document.getElementById('nextQuestionBtn');
+
+            if (!optionsContainer || !rankingContainer || !nextBtn) return;
+
+            optionsContainer.innerHTML = '';
+            rankingContainer.innerHTML = '';
+
+            if (q.type === 'choice') {
+                optionsContainer.style.display = 'flex';
+                rankingContainer.style.display = 'none';
+                nextBtn.style.display = 'none';
+
+                q.options.forEach((opt) => {
+                    const card = document.createElement('div');
+                    card.className = 'game-card';
+                    card.innerHTML = `<span>${opt}</span> <span style="font-size: 1.2rem;">✨</span>`;
+                    card.addEventListener('click', (e) => {
+                        createHeartEffect(e);
+                        optionsContainer.querySelectorAll('.game-card').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        userAnswers[q.id] = opt;
+
+                        setTimeout(() => {
+                            advanceQuestion();
+                        }, 450);
+                    });
+                    optionsContainer.appendChild(card);
+                });
+            } else if (q.type === 'ranking') {
+                optionsContainer.style.display = 'none';
+                rankingContainer.style.display = 'flex';
+                nextBtn.style.display = 'flex';
+
+                renderRankingList();
+            }
+        }
+
+        function renderRankingList() {
+            const rankingContainer = document.getElementById('rankingContainer');
+            if (!rankingContainer) return;
+            rankingContainer.innerHTML = '';
+
+            nicknameRankingList.forEach((name, index) => {
+                const item = document.createElement('div');
+                item.className = 'rank-item';
+                item.draggable = true;
+                item.dataset.index = index;
+
+                item.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <div class="rank-number">${index + 1}</div>
+                        <span>${name}</span>
+                    </div>
+                    <div class="rank-controls">
+                        <button class="rank-btn" onclick="moveRank(${index}, -1)" title="Move Up">⬆️</button>
+                        <button class="rank-btn" onclick="moveRank(${index}, 1)" title="Move Down">⬇️</button>
+                    </div>
+                `;
+
+                item.addEventListener('dragstart', (e) => {
+                    item.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', index);
+                });
+
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                    const targetIndex = index;
+                    if (draggedIndex !== targetIndex) {
+                        const movedItem = nicknameRankingList.splice(draggedIndex, 1)[0];
+                        nicknameRankingList.splice(targetIndex, 0, movedItem);
+                        renderRankingList();
+                    }
+                });
+
+                rankingContainer.appendChild(item);
+            });
+        }
+
+        function moveRank(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < nicknameRankingList.length) {
+                const item = nicknameRankingList.splice(index, 1)[0];
+                nicknameRankingList.splice(newIndex, 0, item);
+                renderRankingList();
+            }
+        }
+
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        if (nextQuestionBtn) {
+            nextQuestionBtn.addEventListener('click', (e) => {
+                createHeartEffect(e);
+                userAnswers['ranking'] = [...nicknameRankingList];
+                advanceQuestion();
+            });
+        }
+
+        function advanceQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                buildResultsPage();
+                transitionToStage(4);
+            }
+        }
+
+        function buildResultsPage() {
+            const summaryContainer = document.getElementById('resultsSummary');
+            if (!summaryContainer) return;
+            summaryContainer.innerHTML = '';
+
+            const categoryLabels = {
+                q1: "💬 Talking Preference",
+                q2: "📞 Deep Conversation",
+                q4: "🫶 Time Together",
+                q5: "🤗 Affection",
+                q6: "😚 Kiss Preference",
+                q7: "💋 Romantic Moment",
+                q8: "🍦 Little Date",
+                q9: "🚶‍♂️ Travel Style",
+                q10: "🌙 Midnight Routine",
+                q11: "❤️ Proper Date",
+                q12: "🎓 Special Place"
+            };
+
+            for (const [key, val] of Object.entries(userAnswers)) {
+                if (key === 'ranking') continue;
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                div.innerHTML = `
+                    <div class="result-category">${categoryLabels[key] || key}</div>
+                    <div class="result-answer">${val}</div>
+                `;
+                summaryContainer.appendChild(div);
+            }
+
+            const rankDiv = document.createElement('div');
+            rankDiv.className = 'result-item';
+            let rankHtml = `<div class="result-category">👑 Favorite Nicknames Order</div>`;
+            nicknameRankingList.forEach((name, idx) => {
+                rankHtml += `<div class="result-answer" style="font-size:0.95rem; margin-top:4px;">${idx + 1}. ${name}</div>`;
+            });
+            rankDiv.innerHTML = rankHtml;
+            summaryContainer.appendChild(rankDiv);
+        }
+
+        const viewFinalBtn = document.getElementById('viewFinalBtn');
+        if (viewFinalBtn) {
+            viewFinalBtn.addEventListener('click', () => {
+                transitionToStage(5);
+                setTimeout(() => {
+                    const l1 = document.getElementById('finalLine1');
+                    const l2 = document.getElementById('finalLine2');
+                    const q = document.getElementById('finalQuote');
+                    const sig = document.getElementById('finalSignature');
+                    if (l1) l1.classList.add('visible');
+                    if (l2) l2.classList.add('visible');
+                    if (q) q.classList.add('visible');
+                    if (sig) sig.classList.add('visible');
+                }, 300);
+            });
+        }
+
+        const whatsappBtn = document.getElementById('whatsappBtn');
+        if (whatsappBtn) {
+            whatsappBtn.addEventListener('click', () => {
+                let msg = `Hey ❤️ I finished your little game.\n\nMy choices:\n`;
+                
+                const categoryLabels = {
+                    q1: "Talking",
+                    q2: "Conversation",
+                    q4: "Time together",
+                    q5: "Affection",
+                    q6: "Kiss",
+                    q7: "Romantic moment",
+                    q8: "Date",
+                    q9: "Travel",
+                    q10: "Midnight",
+                    q11: "First date",
+                    q12: "Place"
+                };
+
+                for (const [key, val] of Object.entries(userAnswers)) {
+                    if (key === 'ranking') continue;
+                    msg += `- ${categoryLabels[key] || key}: ${val}\n`;
+                }
+
+                msg += `\nMy favorite names for you:\n`;
+                nicknameRankingList.forEach((name, idx) => {
+                    msg += `${idx + 1}. ${name}\n`;
+                });
+
+                msg += `\nI can't lose you now.\nIt is you I have chosen. ❤️\n"High on Life by Martin Garrix"\n\n— Pabasara`;
+
+                const encoded = encodeURIComponent(msg);
+                window.open(`https://wa.me/?text=${encoded}`, '_blank');
+            });
+        }
+
+        function createHeartEffect(e) {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = `${e.clientX}px`;
+            heart.style.top = `${e.clientY}px`;
+            
+            const randX = (Math.random() - 0.5) * 80;
+            heart.style.setProperty('--rand-x', `${randX}px`);
+            
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 1000);
+        }
+
+        window.onload = () => {
+            initParticles();
+            
+            // Check whether locked date applies
+            const isLocked = checkLockDate();
+            if (!isLocked) {
+                transitionToStage(1); // Default to Password gate if past release date
+            }
+
+            updateCounters();
+        };
+    </script>
+</body>
+</html>
