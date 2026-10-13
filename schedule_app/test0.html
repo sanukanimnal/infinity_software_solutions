@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Player Desktop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+
+
+        /* The Player Container */
+        #player-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 50;
+            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                        transform 0.2s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #111;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Full Size state - not fully covering surface */
+        .player-large {
+            width: 85vw;
+            height: 85vh;
+            left: 7.5vw !important;
+            top: 7.5vh !important;
+        }
+
+        /* Mini Size state - 1/36th area roughly */
+        .player-mini {
+            width: 240px; 
+            height: 135px;
+            cursor: move;
+        }
+
+        .player-hidden {
+            display: none !important;
+        }
+
+        .header {
+            background: #1e1e1e;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: black;
+            font-weight: bold;
+        }
+
+        .btn-close { background: #ff5f56; }
+        .btn-min { background: #ffbd2e; }
+        .btn-back { 
+            background: #27c93f; 
+            width: auto; 
+            height: 20px; 
+            border-radius: 4px; 
+            padding: 0 8px;
+            color: white;
+            font-size: 10px;
+        }
+
+        .content-area {
+            flex: 1;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* The Iframe representing your external index.html */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: auto;
+        }
+
+        /* Prevent interaction with iframe content while dragging or in mini mode if desired */
+        .player-mini iframe {
+            pointer-events: none;
+        }
+
+        .instruction {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #64748b;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Empty Background UI -->
+    <div id="main-ui"></div>
+
+    <!-- The Player -->
+    <div id="player-container" class="player-mini">
+        <div class="header" id="player-header">
+            <span class="text-[10px] uppercase tracking-widest font-bold text-gray-400">External View</span>
+            <div class="controls">
+                <!-- Added "Back" button to decrease size -->
+                <button id="back-btn" class="btn btn-back hidden" onclick="toggleSize(event)">Back</button>
+                <button class="btn btn-min" onclick="toggleSize(event)" title="Enlarge/Shrink"></button>
+                <button class="btn btn-close" onclick="closePlayer(event)" title="Close"></button>
+            </div>
+        </div>
+        <div class="content-area" id="player-body">
+            <!-- 
+                 Note: To load your local file, the browser usually requires it 
+                 to be served from a web server or you must use the relative path 
+                 if this file is in the same folder.
+            -->
+            <iframe src="index.html" id="external-frame"></iframe>
+        </div>
+    </div>
+
+    <div class="instruction">
+        Press <strong>Q</strong> to reveal • Drag in mini mode • Click mini to enlarge
+    </div>
+
+    <script>
+        const player = document.getElementById('player-container');
+        const backBtn = document.getElementById('back-btn');
+        let isMini = true;
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+
+        function toggleSize(e) {
+            if (e) e.stopPropagation();
+            
+            if (isMini) {
+                player.classList.remove('player-mini');
+                player.classList.add('player-large');
+                backBtn.classList.remove('hidden');
+                // Center it roughly when enlarging
+                player.style.left = "";
+                player.style.top = "";
+            } else {
+                player.classList.remove('player-large');
+                player.classList.add('player-mini');
+                backBtn.classList.add('hidden');
+            }
+            isMini = !isMini;
+        }
+
+        function closePlayer(e) {
+            if (e) e.stopPropagation();
+            player.classList.add('player-hidden');
+        }
+
+        function showPlayer() {
+            player.classList.remove('player-hidden');
+        }
+
+        // Clicking the mini player body enlarges it
+        player.addEventListener('click', () => {
+            if (isMini && !isDragging) {
+                toggleSize();
+            }
+        });
+
+        // Key Listener for 'Q'
+        window.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'q') {
+                showPlayer();
+            }
+        });
+
+        // Drag Logic (Only active in Mini Mode)
+        const startDrag = (e) => {
+            if (!isMini) return;
+            isDragging = true;
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            const rect = player.getBoundingClientRect();
+            offset.x = clientX - rect.left;
+            offset.y = clientY - rect.top;
+            player.style.transition = 'none';
+        };
+
+        const doDrag = (e) => {
+            if (!isDragging || !isMini) return;
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            let newX = clientX - offset.x;
+            let newY = clientY - offset.y;
+            
+            // Constrain to window
+            newX = Math.max(0, Math.min(newX, window.innerWidth - player.offsetWidth));
+            newY = Math.max(0, Math.min(newY, window.innerHeight - player.offsetHeight));
+
+            player.style.left = newX + 'px';
+            player.style.top = newY + 'px';
+            player.style.right = 'auto';
+        };
+
+        const endDrag = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            player.style.transition = 'width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.2s ease';
+        };
+
+        player.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', doDrag);
+        window.addEventListener('mouseup', endDrag);
+        
+        player.addEventListener('touchstart', startDrag, { passive: false });
+        window.addEventListener('touchmove', doDrag, { passive: false });
+        window.addEventListener('touchend', endDrag);
+
+    </script>
+</body>
+</html>

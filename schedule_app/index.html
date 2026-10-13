@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster | Student Elite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        theme: { 100: "#006466", 200: "#065a60", 300: "#0b525b", 400: "#144552", 500: "#1b3a4b", 600: "#212f45", 700: "#272640", 800: "#312244", 900: "#3e1f47", 1000: "#4d194d" }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .dark .glass {
+            background: rgba(33, 47, 69, 0.5);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-grid {
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            background-size: 120px 100%;
+        }
+
+        .dark .timeline-grid {
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        }
+
+        .task-pill {
+            height: 60px;
+            border-radius: 12px;
+            position: absolute;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 12px;
+            z-index: 10;
+        }
+
+        .task-pill:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            z-index: 40;
+        }
+
+        .active-glow {
+            animation: activePulse 2s infinite;
+        }
+
+        @keyframes activePulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 100, 102, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(0, 100, 102, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 100, 102, 0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .clock-dot {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-[#0d1b2a] text-slate-800 dark:text-white transition-colors duration-500">
+
+    <div class="flex h-full w-full relative">
+        <!-- SIDEBAR -->
+        <aside class="w-[360px] glass flex flex-col z-50 p-6 overflow-y-auto">
+            <!-- CLOCK & HEADER -->
+            <div class="flex flex-col gap-4 mb-8">
+                <div class="flex items-center justify-between">
+                    <div id="liveClock"
+                        class="mono text-3xl font-black tracking-tighter text-theme-100 dark:text-emerald-400">
+                        00<span class="clock-dot">:</span>00<span class="text-sm opacity-50 ml-1 uppercase font-bold"
+                            id="clockSec">00</span>
+                    </div>
+                    <button id="themeToggle"
+                        class="p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-white/10">
+                        <svg id="sun" class="hidden dark:block text-yellow-400" width="18" height="18"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="12" cy="12" r="5" />
+                            <path
+                                d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                        </svg>
+                        <svg id="moon" class="dark:hidden text-slate-600" width="18" height="18" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 bg-theme-100 rounded-lg flex items-center justify-center text-white font-black text-xs shadow-lg">
+                        TM</div>
+                    <h1 class="font-black text-[10px] uppercase tracking-[0.3em] opacity-50">Student Pro Elite</h1>
+                </div>
+            </div>
+
+            <!-- ANALYTICS WIDGET -->
+            <div class="bg-white dark:bg-slate-800/50 p-5 rounded-[24px] border dark:border-white/5 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Performance Snapshot
+                    </h4>
+                    <button id="openAnalyticsBtn"
+                        class="text-theme-100 dark:text-emerald-400 text-[10px] font-bold uppercase underline">Report</button>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-3">
+                    <div>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Today Focus</p>
+                        <span id="statFocus" class="text-2xl font-black">0.0h</span>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Efficiency</p>
+                        <span id="statEff" class="text-2xl font-black text-theme-100 dark:text-emerald-400">0%</span>
+                    </div>
+                </div>
+                <div class="pt-3 border-t dark:border-white/5">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Lifetime Focused</p>
+                    <span id="statLifetime" class="text-lg font-black opacity-80">0.0 hrs</span>
+                </div>
+            </div>
+
+            <!-- ACTIVE MISSION -->
+            <div id="activeWidget"
+                class="hidden bg-theme-100 rounded-[28px] p-6 text-white mb-4 active-glow relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="text-[10px] font-black uppercase opacity-70 tracking-widest">In Progress</span>
+                    <h3 id="activeTitle" class="text-xl font-black truncate mt-1">Study Session</h3>
+                    <div id="activeTimer" class="text-4xl font-black mono mt-4 mb-4">00:00:00</div>
+                    <button onclick="handleDoneClick()"
+                        class="w-full py-3 bg-white text-theme-100 rounded-xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-transform">Complete
+                        Session</button>
+                </div>
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+            </div>
+
+            <!-- NEXT MISSION WIDGET -->
+            <div id="nextWidget"
+                class="bg-slate-100 dark:bg-white/5 rounded-[24px] p-5 mb-6 border dark:border-white/5 hidden">
+                <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest">Upcoming</span>
+                <h4 id="nextTitle" class="font-black text-sm mt-1 truncate">-</h4>
+                <div class="flex items-center justify-between mt-3">
+                    <span id="nextTime" class="text-[10px] font-bold opacity-60 uppercase mono">-</span>
+                    <span id="nextCountdown"
+                        class="px-2 py-1 bg-theme-100/10 text-theme-100 dark:text-emerald-400 rounded-md text-[9px] font-black mono tracking-tighter">Starts
+                        in --:--</span>
+                </div>
+            </div>
+
+            <!-- IDLE STATE -->
+            <div id="idleWidget"
+                class="bg-slate-100 dark:bg-white/5 rounded-[28px] p-8 text-center border-2 border-dashed border-slate-200 dark:border-white/10 mb-6">
+                <p class="text-slate-400 font-bold uppercase text-[10px]">No Active Session</p>
+            </div>
+
+            <div class="space-y-3 mb-6">
+                <button id="openAgendaBtn"
+                    class="w-full py-4 bg-slate-200/50 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <line x1="8" y1="6" x2="21" y2="6" />
+                        <line x1="8" y1="12" x2="21" y2="12" />
+                        <line x1="8" y1="18" x2="21" y2="18" />
+                        <line x1="3" y1="6" x2="3.01" y2="6" />
+                        <line x1="3" y1="12" x2="3.01" y2="12" />
+                        <line x1="3" y1="18" x2="3.01" y2="18" />
+                    </svg>
+                    Daily Agenda
+                </button>
+                <button id="muteBtn"
+                    class="w-full py-4 bg-slate-200/50 dark:bg-white/5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
+                    <span id="muteStatus">Audio: On</span>
+                </button>
+            </div>
+
+            <div class="mt-auto">
+                <button id="newTaskBtn"
+                    class="w-full py-5 bg-theme-100 hover:bg-theme-200 text-white rounded-[24px] font-black uppercase text-xs shadow-2xl transition-all">Schedule
+                    Session</button>
+            </div>
+        </aside>
+
+        <!-- MAIN TIMELINE -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-[#0d1b2a]">
+            <header
+                class="h-20 shrink-0 border-b dark:border-white/10 flex items-center justify-between px-8 bg-white/50 dark:bg-[#0d1b2a]/50 backdrop-blur-md">
+                <h2 class="text-xl font-black uppercase tracking-tight">Timeline</h2>
+                <div class="flex items-center bg-slate-100 dark:bg-white/5 rounded-xl p-1">
+                    <button onclick="changeDay(-1)" class="p-2 hover:bg-white dark:hover:bg-white/10 rounded-lg"><svg
+                            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3">
+                            <polyline points="15 18 9 12 15 6" />
+                        </svg></button>
+                    <span id="dateDisplay" class="px-4 text-[10px] font-black uppercase tracking-widest">Today</span>
+                    <button onclick="changeDay(1)" class="p-2 hover:bg-white dark:hover:bg-white/10 rounded-lg"><svg
+                            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg></button>
+                </div>
+            </header>
+
+            <div id="timelineContainer" class="flex-1 overflow-auto timeline-grid relative">
+                <div class="flex h-10 border-b dark:border-white/10 sticky top-0 bg-white/90 dark:bg-[#0d1b2a]/90 z-20">
+                    <div
+                        class="w-[120px] shrink-0 border-r dark:border-white/10 flex items-center justify-center text-[9px] font-bold text-slate-400">
+                        HOUR</div>
+                    <div id="hourLabels" class="flex"></div>
+                </div>
+                <div class="relative min-h-[600px] w-fit pt-8" id="pillsContainer">
+                    <!-- Now Bar is positioned relative to the container width. 120px is 1 hour -->
+                    <div id="nowBar"
+                        class="absolute top-0 bottom-0 w-0.5 bg-red-500 z-30 pointer-events-none shadow-[0_0_10px_red]">
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- NOTIFICATION ALARM OVERLAY -->
+    <div id="alarmOverlay"
+        class="fixed inset-0 z-[1000] bg-theme-100 flex flex-col items-center justify-center p-10 text-white invisible opacity-0 transition-all">
+        <div class="w-32 h-32 rounded-full bg-white/20 flex items-center justify-center animate-ping absolute"></div>
+        <div class="w-24 h-24 rounded-full bg-white text-theme-100 flex items-center justify-center relative z-10 mb-8">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+        </div>
+        <h2 id="alarmTitle" class="text-4xl font-black uppercase mb-2">Task Starting!</h2>
+        <p id="alarmSub" class="text-xl opacity-80 mb-12">Mathematics Study Session</p>
+        <button onclick="stopAlarm()"
+            class="px-12 py-5 bg-white text-theme-100 rounded-full font-black uppercase tracking-widest text-sm hover:scale-110 transition-transform">Dismiss
+            Alarm</button>
+    </div>
+
+    <!-- COMPLETION AUDIT MODAL -->
+    <div id="auditModal"
+        class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-6 invisible opacity-0 transition-all">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-[40px] p-8 text-center shadow-2xl">
+            <h3 class="text-2xl font-black uppercase mb-2">Audit Session</h3>
+            <p class="text-slate-400 text-xs font-bold mb-8">How long did this actually take you?</p>
+            <div class="grid grid-cols-1 gap-3 mb-6">
+                <button onclick="finishAudit('less')"
+                    class="py-4 bg-slate-50 dark:bg-white/5 hover:bg-emerald-500 hover:text-white rounded-2xl font-black text-[10px] uppercase transition-all">Super
+                    Efficient (-15%)</button>
+                <button onclick="finishAudit('on-time')"
+                    class="py-4 bg-slate-50 dark:bg-white/5 hover:bg-theme-100 hover:text-white rounded-2xl font-black text-[10px] uppercase transition-all">Exactly
+                    as Planned</button>
+                <button onclick="finishAudit('more')"
+                    class="py-4 bg-slate-50 dark:bg-white/5 hover:bg-slate-400 hover:text-white rounded-2xl font-black text-[10px] uppercase transition-all">Overtime
+                    (+15%)</button>
+            </div>
+            <div class="relative mb-8">
+                <div class="absolute inset-x-0 top-1/2 h-px bg-slate-200 dark:bg-white/10"></div>
+                <span class="relative bg-white dark:bg-slate-900 px-4 text-[9px] font-black text-slate-400 uppercase">Or
+                    Custom Minutes</span>
+            </div>
+            <div class="flex gap-2 mb-8">
+                <input type="number" id="customMin" placeholder="Mins"
+                    class="flex-1 bg-slate-50 dark:bg-white/5 border-none p-4 rounded-xl font-bold text-center">
+                <button onclick="finishAudit('custom')"
+                    class="bg-theme-100 text-white px-6 rounded-xl font-black text-[10px] uppercase">Set</button>
+            </div>
+            <button onclick="closeModal('auditModal')"
+                class="text-slate-400 font-black uppercase text-[9px] tracking-[0.3em]">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ANALYTICS PANEL -->
+    <div id="analyticsPanel"
+        class="fixed inset-0 z-[150] bg-black/40 backdrop-blur-sm invisible opacity-0 transition-all">
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-white dark:bg-slate-900 shadow-2xl p-8 transform translate-x-full transition-transform duration-500 overflow-y-auto"
+            id="analyticsPanelContent">
+            <div class="flex justify-between items-center mb-10">
+                <h3 class="text-3xl font-black uppercase tracking-tight">Performance Lab</h3>
+                <button onclick="closeAnalytics()"
+                    class="p-3 bg-slate-100 dark:bg-white/10 rounded-full hover:rotate-90 transition-transform"><svg
+                        width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-10">
+                <div class="bg-slate-50 dark:bg-white/5 p-6 rounded-3xl">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-2">Total Mapped</p>
+                    <span id="labTotalPlanned" class="text-2xl font-black">0h</span>
+                </div>
+                <div class="bg-slate-50 dark:bg-white/5 p-6 rounded-3xl border-2 border-emerald-500/20">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-2">Actual Work</p>
+                    <span id="labTotalActual" class="text-2xl font-black">0h</span>
+                </div>
+                <div class="bg-slate-50 dark:bg-white/5 p-6 rounded-3xl">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-2">Completed</p>
+                    <span id="labCount" class="text-2xl font-black">0</span>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-10">
+                <div>
+                    <h4 class="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-6">Focus Intensity
+                        (Last 7 Days)</h4>
+                    <div class="h-48 flex items-end justify-between gap-2 px-2" id="chartBars">
+                        <!-- Bars injected here -->
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-6">Subject
+                        Distribution</h4>
+                    <div id="subjectBreakdown" class="space-y-3">
+                        <!-- List injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-theme-100 rounded-3xl p-8 text-white">
+                <h5 class="font-black uppercase mb-4 text-xs tracking-widest">Efficiency Engine</h5>
+                <p id="insightText" class="text-sm opacity-80 leading-relaxed font-medium">Add more data points to
+                    calculate your subject mastery scores.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AGENDA PANEL -->
+    <div id="agendaPanel" class="fixed inset-0 z-[150] bg-black/40 backdrop-blur-sm invisible opacity-0 transition-all">
+        <div class="absolute left-0 top-0 bottom-0 w-full max-w-md bg-white dark:bg-[#1b263b] shadow-2xl p-8 transform -translate-x-full transition-transform duration-500 overflow-y-auto"
+            id="agendaPanelContent">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-black uppercase">Agenda</h3>
+                <button onclick="closeAgenda()" class="p-2 bg-slate-100 dark:bg-white/5 rounded-lg"><svg width="20"
+                        height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="15 18 9 12 15 6" />
+                    </svg></button>
+            </div>
+            <div class="flex gap-2 mb-6 p-1 bg-slate-100 dark:bg-white/5 rounded-xl">
+                <button onclick="setFilter('all')" id="f-all"
+                    class="flex-1 py-2 rounded-lg font-black text-[10px] uppercase bg-white dark:bg-slate-700 shadow-sm">All</button>
+                <button onclick="setFilter('pending')" id="f-pending"
+                    class="flex-1 py-2 rounded-lg font-black text-[10px] uppercase">Pending</button>
+                <button onclick="setFilter('done')" id="f-done"
+                    class="flex-1 py-2 rounded-lg font-black text-[10px] uppercase">Done</button>
+            </div>
+            <div id="agendaList" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- NEW TASK FORM -->
+    <div id="formModal"
+        class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-6 invisible opacity-0 transition-all">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[40px] p-10 transform scale-95 transition-all"
+            id="formModalContent">
+            <h3 class="text-2xl font-black dark:text-white mb-8 text-center uppercase tracking-[0.3em]">Plan Mission
+            </h3>
+            <form id="taskForm" class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Objective Name</label>
+                    <input type="text" id="taskName" required placeholder="e.g. Solve Algebra Problems"
+                        class="w-full p-5 bg-slate-50 dark:bg-white/5 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-theme-100">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Start Time</label>
+                        <input type="time" id="taskStart" required
+                            class="w-full p-5 bg-slate-50 dark:bg-white/5 rounded-2xl font-bold">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black uppercase text-slate-400 ml-2">End Time</label>
+                        <input type="time" id="taskEnd" required
+                            class="w-full p-5 bg-slate-50 dark:bg-white/5 rounded-2xl font-bold">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Date</label>
+                        <input type="date" id="taskDate" required
+                            class="w-full p-5 bg-slate-50 dark:bg-white/5 rounded-2xl font-bold">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Subject Category</label>
+                        <select id="taskSubject"
+                            class="w-full p-5 bg-slate-50 dark:bg-white/5 rounded-2xl font-bold appearance-none">
+                            <option value="Mathematics">Pure Maths</option>
+                            <option value="Physics">Physics</option>
+                            <option value="Chemistry">Chemistry</option>
+                            <option value="Applied">Applied Maths</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button type="button" onclick="closeModal('formModal')"
+                        class="flex-1 py-5 bg-slate-100 dark:bg-slate-800 rounded-3xl font-black uppercase text-[10px] tracking-widest">Back</button>
+                    <button type="submit"
+                        class="flex-1 py-5 bg-theme-100 text-white rounded-3xl font-black uppercase text-[10px] tracking-widest shadow-xl">Confirm
+                        Plan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <audio id="alarmSfx" loop src="alarm.mp3"
+        preload="auto"></audio>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('tm_v4_student')) || [];
+        let viewDate = new Date().toISOString().split('T')[0];
+        let filter = 'all';
+        let isMuted = false;
+        let auditingId = null;
+        let activeAlarmTask = null;
+        const GRID_STEP = 120; // 120px = 1 hour
+        const COLORS = ["#006466", "#065a60", "#0b525b", "#144552", "#1b3a4b", "#212f45", "#272640", "#312244", "#3e1f47", "#4d194d"];
+
+        // --- CORE HELPERS ---
+        const toDec = t => { if (!t) return 0; const [h, m] = t.split(':').map(Number); return h + (m / 60); };
+        const getDur = (s, e) => {
+            const start = toDec(s);
+            const end = toDec(e);
+            return end > start ? end - start : (24 - start) + end; // Handle overnight? (Simple day-only for now)
+        };
+        const save = () => { localStorage.setItem('tm_v4_student', JSON.stringify(tasks)); renderAll(); };
+
+        function openModal(id) {
+            const el = document.getElementById(id);
+            el.classList.remove('invisible', 'opacity-0');
+            const inner = el.querySelector('div');
+            if (inner && inner.classList.contains('scale-95')) inner.classList.remove('scale-95');
+        }
+
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            el.classList.add('invisible', 'opacity-0');
+            const inner = el.querySelector('div');
+            if (inner) inner.classList.add('scale-95');
+        }
+
+        // --- APP ENGINE ---
+        function updateUI() {
+            const now = new Date();
+            const h = now.getHours(); const m = now.getMinutes(); const s = now.getSeconds();
+            const nowDec = h + (m / 60) + (s / 3600);
+            const today = now.toISOString().split('T')[0];
+
+            // Live Clock Update
+            const clockEl = document.getElementById('liveClock');
+            clockEl.innerHTML = `${h.toString().padStart(2, '0')}<span class="clock-dot">:</span>${m.toString().padStart(2, '0')}<span class="text-sm opacity-50 ml-1 uppercase font-bold" id="clockSec">${s.toString().padStart(2, '0')}</span>`;
+
+            // Now Bar (Fixed logic: offset is 120px per hour + 120px initial hour label column)
+            if (viewDate === today) {
+                const hourLabelsWidth = 120;
+                document.getElementById('nowBar').style.left = `${(nowDec * GRID_STEP) + hourLabelsWidth}px`;
+                document.getElementById('nowBar').style.display = 'block';
+            } else {
+                document.getElementById('nowBar').style.display = 'none';
+            }
+
+            // Task Filtering
+            const todayTasks = tasks.filter(t => t.date === today && !t.completed);
+
+            // Active Widget
+            const active = todayTasks.find(t => nowDec >= toDec(t.startTime) && nowDec < toDec(t.endTime));
+            if (active) {
+                document.getElementById('activeWidget').classList.remove('hidden');
+                document.getElementById('idleWidget').classList.add('hidden');
+                document.getElementById('nextWidget').classList.add('hidden');
+                document.getElementById('activeTitle').innerText = active.name;
+                const [eh, em] = active.endTime.split(':').map(Number);
+                const target = new Date(); target.setHours(eh, em, 0);
+                const diff = target - now;
+                const dh = Math.floor(diff / 3600000), dm = Math.floor((diff % 3600000) / 60000), ds = Math.floor((diff % 60000) / 1000);
+                document.getElementById('activeTimer').innerText = `${dh.toString().padStart(2, '0')}:${dm.toString().padStart(2, '0')}:${ds.toString().padStart(2, '0')}`;
+                window.currentActiveId = active.id;
+            } else {
+                document.getElementById('activeWidget').classList.add('hidden');
+                document.getElementById('idleWidget').classList.remove('hidden');
+
+                // Show Next Widget if no active task
+                const upcoming = todayTasks.filter(t => toDec(t.startTime) > nowDec).sort((a, b) => a.startTime.localeCompare(b.startTime))[0];
+                if (upcoming) {
+                    document.getElementById('nextWidget').classList.remove('hidden');
+                    document.getElementById('nextTitle').innerText = upcoming.name;
+                    document.getElementById('nextTime').innerText = `${upcoming.startTime} - ${upcoming.endTime}`;
+
+                    const [sh, sm] = upcoming.startTime.split(':').map(Number);
+                    const target = new Date(); target.setHours(sh, sm, 0);
+                    const diff = target - now;
+                    const dm = Math.floor(diff / 60000), ds = Math.floor((diff % 60000) / 1000);
+                    document.getElementById('nextCountdown').innerText = `Starts in ${dm}m ${ds}s`;
+                } else {
+                    document.getElementById('nextWidget').classList.add('hidden');
+                }
+            }
+            checkAlarms();
+        }
+
+        // --- ALARM SYSTEM ---
+        function checkAlarms() {
+            const now = new Date();
+            const nowStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            const today = now.toISOString().split('T')[0];
+
+            tasks.forEach(t => {
+                if (t.date === today && !t.completed) {
+                    if ((t.startTime === nowStr || t.endTime === nowStr) && activeAlarmTask !== t.id + nowStr) {
+                        triggerAlarm(t, t.startTime === nowStr ? "Starting" : "Ending");
+                        activeAlarmTask = t.id + nowStr;
+                    }
+                }
+            });
+        }
+
+        function triggerAlarm(task, phase) {
+            if (!isMuted) document.getElementById('alarmSfx').play().catch(() => { });
+            document.getElementById('alarmTitle').innerText = `Task ${phase}!`;
+            document.getElementById('alarmSub').innerText = task.name;
+            openModal('alarmOverlay');
+        }
+
+        function stopAlarm() {
+            document.getElementById('alarmSfx').pause();
+            document.getElementById('alarmSfx').currentTime = 0;
+            closeModal('alarmOverlay');
+        }
+
+        // --- RENDERERS ---
+        function renderTimeline() {
+            const container = document.getElementById('pillsContainer');
+            document.querySelectorAll('.task-pill').forEach(el => el.remove());
+
+            const dayTasks = tasks.filter(t => t.date === viewDate).sort((a, b) => a.startTime.localeCompare(b.startTime));
+            dayTasks.forEach((t, i) => {
+                const s = toDec(t.startTime); const e = toDec(t.endTime);
+                const pill = document.createElement('div');
+                pill.className = `task-pill text-white ${t.completed ? 'opacity-40 grayscale-[0.5]' : ''}`;
+                pill.style.left = `${(s * GRID_STEP) + 120}px`;
+                pill.style.width = `${(e - s) * GRID_STEP}px`;
+                pill.style.top = `${(i * 70) + 40}px`;
+                pill.style.backgroundColor = t.completed ? '#64748b' : COLORS[i % COLORS.length];
+                pill.innerHTML = `
+                    <div class="uppercase font-black text-[10px] truncate">${t.name}</div>
+                    <div class="text-[8px] font-bold opacity-60">${t.subject || 'Core'} | ${t.startTime}-${t.endTime}</div>
+                `;
+                pill.onclick = () => { if (!t.completed) handleDoneClick(t.id); };
+                container.appendChild(pill);
+            });
+
+            document.getElementById('dateDisplay').innerText = viewDate === new Date().toISOString().split('T')[0] ? "Today" : viewDate;
+            calculateStats();
+        }
+
+        function calculateStats() {
+            const dayTasks = tasks.filter(t => t.date === viewDate);
+            const completed = dayTasks.filter(t => t.completed);
+
+            let actualSum = 0;
+            let plannedSum = 0;
+            completed.forEach(t => {
+                actualSum += t.actualDuration || getDur(t.startTime, t.endTime);
+                plannedSum += getDur(t.startTime, t.endTime);
+            });
+
+            const eff = plannedSum ? Math.round((plannedSum / actualSum) * 100) : 0;
+            document.getElementById('statFocus').innerText = actualSum.toFixed(1) + 'h';
+            document.getElementById('statEff').innerText = `${eff}%`;
+
+            // Lifetime Focus
+            const lifetime = tasks.filter(t => t.completed).reduce((a, t) => a + (t.actualDuration || 0), 0);
+            document.getElementById('statLifetime').innerText = `${lifetime.toFixed(1)} hrs`;
+        }
+
+        function handleDoneClick(id) {
+            auditingId = id || window.currentActiveId;
+            if (auditingId) openModal('auditModal');
+        }
+
+        function finishAudit(mode) {
+            const task = tasks.find(t => t.id === auditingId);
+            if (task) {
+                const planned = getDur(task.startTime, task.endTime);
+                if (mode === 'less') task.actualDuration = planned * 0.85;
+                else if (mode === 'more') task.actualDuration = planned * 1.15;
+                else if (mode === 'custom') task.actualDuration = (parseInt(document.getElementById('customMin').value) || (planned * 60)) / 60;
+                else task.actualDuration = planned;
+
+                task.completed = true;
+                save();
+            }
+            closeModal('auditModal');
+            document.getElementById('customMin').value = '';
+        }
+
+        // --- ANALYTICS LAB ---
+        function renderLab() {
+            // 1. Daily Bar Chart
+            const chart = document.getElementById('chartBars');
+            chart.innerHTML = '';
+
+            const days = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                days.push(d.toISOString().split('T')[0]);
+            }
+
+            let maxWork = 1;
+            const data = days.map(date => {
+                const dayWork = tasks.filter(t => t.date === date && t.completed)
+                    .reduce((acc, t) => acc + (t.actualDuration || 0), 0);
+                if (dayWork > maxWork) maxWork = dayWork;
+                return { date, work: dayWork };
+            });
+
+            data.forEach(d => {
+                const col = document.createElement('div');
+                col.className = "flex-1 flex flex-col items-center group relative h-full";
+                const h = (d.work / (maxWork * 1.2)) * 100;
+                col.innerHTML = `
+                    <div class="text-[8px] font-black opacity-0 group-hover:opacity-100 mb-1 transition-opacity">${d.work.toFixed(1)}h</div>
+                    <div class="w-full bg-slate-100 dark:bg-white/5 rounded-t-lg transition-all duration-700 flex flex-col justify-end" style="height: ${Math.max(h, 5)}%">
+                        <div class="w-full h-full bg-theme-100 rounded-t-lg opacity-40 group-hover:opacity-100"></div>
+                    </div>
+                    <div class="text-[7px] font-black uppercase mt-2 opacity-40">${d.date.split('-')[2]}</div>
+                `;
+                chart.appendChild(col);
+            });
+
+            // 2. Subject Breakdown
+            const subList = document.getElementById('subjectBreakdown');
+            subList.innerHTML = '';
+            const subjects = {};
+            let totalActual = 0;
+
+            tasks.filter(t => t.completed).forEach(t => {
+                const sub = t.subject || "Uncategorized";
+                const dur = t.actualDuration || getDur(t.startTime, t.endTime);
+                subjects[sub] = (subjects[sub] || 0) + dur;
+                totalActual += dur;
+            });
+
+            Object.entries(subjects).sort((a, b) => b[1] - a[1]).forEach(([name, val]) => {
+                const perc = totalActual ? Math.round((val / totalActual) * 100) : 0;
+                const row = document.createElement('div');
+                row.className = "space-y-1";
+                row.innerHTML = `
+                    <div class="flex justify-between items-center text-[9px] font-black uppercase">
+                        <span>${name}</span>
+                        <span class="opacity-60">${val.toFixed(1)}h (${perc}%)</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full bg-theme-100" style="width: ${perc}%"></div>
+                    </div>
+                `;
+                subList.appendChild(row);
+            });
+
+            document.getElementById('labTotalPlanned').innerText = tasks.reduce((a, t) => a + getDur(t.startTime, t.endTime), 0).toFixed(1) + 'h';
+            document.getElementById('labTotalActual').innerText = totalActual.toFixed(1) + 'h';
+            document.getElementById('labCount').innerText = tasks.filter(t => t.completed).length;
+
+            openModal('analyticsPanel');
+            document.getElementById('analyticsPanelContent').classList.remove('translate-x-full');
+        }
+
+        // --- UI EVENTS ---
+        function renderAll() { renderTimeline(); renderAgenda(); }
+        function closeAnalytics() { document.getElementById('analyticsPanelContent').classList.add('translate-x-full'); setTimeout(() => closeModal('analyticsPanel'), 500); }
+
+        function openAgenda() { renderAgenda(); openModal('agendaPanel'); document.getElementById('agendaPanelContent').classList.remove('-translate-x-full'); }
+        function closeAgenda() { document.getElementById('agendaPanelContent').classList.add('-translate-x-full'); setTimeout(() => closeModal('agendaPanel'), 500); }
+
+        function renderAgenda() {
+            const list = document.getElementById('agendaList');
+            let filtered = tasks.filter(t => t.date === viewDate);
+            if (filter === 'pending') filtered = filtered.filter(t => !t.completed);
+            if (filter === 'done') filtered = filtered.filter(t => t.completed);
+
+            list.innerHTML = filtered.length ? '' : '<div class="py-10 text-center opacity-20 font-black uppercase text-xs">Clear Agenda</div>';
+            filtered.sort((a, b) => a.startTime.localeCompare(b.startTime)).forEach(t => {
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-2xl flex items-center justify-between border ${t.completed ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/5'}`;
+                item.innerHTML = `
+                    <div>
+                        <h5 class="font-black text-[11px] uppercase ${t.completed ? 'line-through opacity-40' : ''}">${t.name}</h5>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">${t.subject} | ${t.startTime} - ${t.endTime}</p>
+                    </div>
+                    <button onclick="tasks=tasks.filter(x=>x.id!==${t.id});save();" class="p-2 text-red-500 opacity-50 hover:opacity-100 transition-opacity"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function setFilter(f) {
+            filter = f;
+            ['all', 'pending', 'done'].forEach(x => {
+                const b = document.getElementById(`f-${x}`);
+                b.className = f === x ? "flex-1 py-2 rounded-lg font-black text-[10px] uppercase bg-white dark:bg-slate-700 shadow-sm" : "flex-1 py-2 rounded-lg font-black text-[10px] uppercase";
+            });
+            renderAgenda();
+        }
+
+        function changeDay(delta) {
+            const d = new Date(viewDate);
+            d.setDate(d.getDate() + delta);
+            viewDate = d.toISOString().split('T')[0];
+            renderAll();
+        }
+
+        // --- INIT ---
+        const hourLabels = document.getElementById('hourLabels');
+        for (let i = 0; i < 24; i++) {
+            const l = document.createElement('div');
+            l.className = "w-[120px] shrink-0 border-r dark:border-white/10 flex items-center justify-center text-[9px] font-bold text-slate-400";
+            l.innerText = `${i.toString().padStart(2, '0')}:00`;
+            hourLabels.appendChild(l);
+        }
+
+        document.getElementById('taskForm').onsubmit = (e) => {
+            e.preventDefault();
+            const newTask = {
+                id: Date.now(),
+                name: document.getElementById('taskName').value,
+                startTime: document.getElementById('taskStart').value,
+                endTime: document.getElementById('taskEnd').value,
+                date: document.getElementById('taskDate').value,
+                subject: document.getElementById('taskSubject').value,
+                completed: false
+            };
+            tasks.push(newTask);
+            viewDate = newTask.date;
+            save(); e.target.reset(); closeModal('formModal');
+        };
+
+        document.getElementById('newTaskBtn').onclick = () => { document.getElementById('taskDate').value = viewDate; openModal('formModal'); };
+        document.getElementById('themeToggle').onclick = () => document.documentElement.classList.toggle('dark');
+        document.getElementById('openAnalyticsBtn').onclick = renderLab;
+        document.getElementById('openAgendaBtn').onclick = openAgenda;
+        document.getElementById('muteBtn').onclick = () => { isMuted = !isMuted; document.getElementById('muteStatus').innerText = isMuted ? 'Audio: Off' : 'Audio: On'; };
+
+        setInterval(updateUI, 1000);
+        renderAll(); updateUI();
+
+        // Auto-scroll to current time on load
+        setTimeout(() => {
+            document.getElementById('timelineContainer').scrollLeft = (new Date().getHours() * GRID_STEP);
+        }, 100);
+    </script>
+</body>
+
+</html>
